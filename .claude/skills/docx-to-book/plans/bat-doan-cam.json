@@ -1,0 +1,210 @@
+{
+  "source": "../../../../BDC.docx",
+  "output": "../../../../books/bat-doan-cam.html",
+  "work": "../work",
+  "title": "Tự Luyện Bát Đoạn Cẩm Thiếu Lâm",
+  "byline": "GS. Hàng Thanh",
+  "cover": 0,
+  "cover_caption": "Bìa bản in 1974 — tác giả xuất bản",
+  "chapters": {
+    "2": "Lời Tựa",
+    "19": "Chương Thứ Nhất — Tổng Luận",
+    "57": "Chương Thứ Nhì — Bát Đoạn Cẩm Thiếu Lâm Tự",
+    "95": "Đệ Nhất Đoạn Cẩm — Lưỡng Thủ Kình Thiên Lý Tam Tiêu",
+    "119": "Đệ Nhị Đoạn Cẩm — Tả Hữu Khai Cung Tự Xạ Điêu",
+    "139": "Đệ Tam Đoạn Cẩm — Điều Lý Tỳ Vị Đơn Cử Thủ",
+    "159": "Đệ Tứ Đoạn Cẩm — Ngũ Lao Thất Thương Vọng Hậu Tiều",
+    "180": "Đệ Ngũ Đoạn Cẩm — Dao Đầu Bài Vĩ Khứ Tâm Hỏa",
+    "208": "Đệ Lục Đoạn Cẩm — Bối Hậu Thất Điên Bách Bệnh Tiêu",
+    "230": "Đệ Thất Đoạn Cẩm — Toàn Quyền Nộ Mục Tăng Khí Lực",
+    "250": "Đệ Bát Đoạn Cẩm — Lưỡng Thủ Phan Túc Cố Thận Eo",
+    "278": "Phần Phụ Thuộc — Nới Dãn Toàn Diện"
+  },
+  "sections": {
+    "20": "Bát Đoạn Cẩm Là Gì?",
+    "30": "Sự Khác Biệt Giữa Bát Đoạn Cẩm Và Nội Công",
+    "44": "Sự Thành Công Của Bát Đoạn Cẩm",
+    "67": "Cách Luyện Tập Bát Đoạn Cẩm",
+    "79": "Tám Đoạn Của Bát Đoạn Cẩm",
+    "85": "Khẩu Quyết Bát Đoạn Cẩm",
+    "304": "Đoạn Thứ Nhất: Đưa Hai Tay Lên Xuống",
+    "312": "Đoạn Thứ Hai: Đứng Lên Ngồi Xuống",
+    "321": "Đoạn Thứ Ba: Đưa Hai Tay Ngang Bằng Ra Sau"
+  },
+  "quote": [
+    99,
+    121,
+    140,
+    161,
+    184,
+    210,
+    232,
+    252
+  ],
+  "merge": [
+    107,
+    124,
+    183,
+    187,
+    197,
+    199,
+    213,
+    217,
+    224,
+    249,
+    254,
+    259,
+    269,
+    284,
+    306,
+    327
+  ],
+  "drop": [
+    1,
+    2,
+    18,
+    19,
+    20,
+    30,
+    44,
+    56,
+    57,
+    58,
+    67,
+    79,
+    85,
+    94,
+    95,
+    96,
+    97,
+    119,
+    138,
+    139,
+    158,
+    159,
+    179,
+    180,
+    208,
+    229,
+    230,
+    250,
+    277,
+    278,
+    279,
+    303,
+    304,
+    311,
+    312,
+    320,
+    321
+  ],
+  "drop_images": [
+    "IMG5"
+  ],
+  "captions": {
+    "IMG1": "Hình 1 – 2 – 3 – 4",
+    "IMG2": "Hình 10 – 11 – 12",
+    "IMG3": "Hình 19 – 20",
+    "IMG4": "Hình 21 – 22 – 23",
+    "IMG6": "Hình 61 – 62"
+  },
+  "replace": [
+    [
+      "(Ấn Độ) qua? Nhưng",
+      "(Ấn Độ) qua… Nhưng"
+    ],
+    [
+      "v..v?",
+      "v..v…"
+    ],
+    [
+      "mở đầu bằng: ?Hồi xưa?.",
+      "mở đầu bằng: “Hồi xưa”."
+    ],
+    [
+      "người ta đồn rằng??,",
+      "người ta đồn rằng…”,"
+    ],
+    [
+      "điều dễ nhận định?",
+      "điều dễ nhận định…"
+    ],
+    [
+      "có cả hình ảnh?(Thái Cực",
+      "có cả hình ảnh… (Thái Cực"
+    ],
+    [
+      "không biết mệt?là nhờ",
+      "không biết mệt… là nhờ"
+    ],
+    [
+      "12 tuổi mới xin về?soạn giả",
+      "12 tuổi mới xin về… soạn giả"
+    ],
+    [
+      "đưa vào nhai?),",
+      "đưa vào nhai…),"
+    ],
+    [
+      "đi vào lịch sử? (Ai cũng",
+      "đi vào lịch sử… (Ai cũng"
+    ],
+    [
+      "gập ghềnh và dương cung?",
+      "gập ghềnh và dương cung…"
+    ],
+    [
+      "<strong>Động tác 3:</strong>?",
+      "<strong>Động tác 3:</strong>… "
+    ],
+    [
+      "bắn cung mỗi bên ba lần?",
+      "bắn cung mỗi bên ba lần…"
+    ],
+    [
+      "khởi đầu cho đoạn kế?và cứ thế",
+      "khởi đầu cho đoạn kế… và cứ thế"
+    ],
+    [
+      "<strong>Động tác 2:</strong>?",
+      "<strong>Động tác 2:</strong>… "
+    ],
+    [
+      "tay trái chống lên?giống như",
+      "tay trái chống lên… giống như"
+    ],
+    [
+      "lưu thông vậy?<em>xem tiếp",
+      "lưu thông vậy… <em>xem tiếp"
+    ],
+    [
+      "tiếp tục làm trở lại?Nên nhớ",
+      "tiếp tục làm trở lại… Nên nhớ"
+    ],
+    [
+      "thì lúa tốt?<em>Các phương pháp",
+      "thì lúa tốt… <em>Các phương pháp"
+    ]
+  ],
+  "rewrite": {
+    "211": "<strong>Động tác 1:</strong> <em>Co gối hạ thân xuống</em> (ngồi chồm hổm), <em>hai tay từ hai bên mông lướt qua hai bên đi xuống tựa hai bắp chân, hơi thở để trong bụng, kế đoạn thở ra đầy phổi. Thóp bụng lại, chân búng mạnh cho thân nhảy lên trên không, người biến thành thẳng đứng trong không trung, hai tay kéo lại vị trí cũ trong khi chân đang ở trên không trung. Khi rơi xuống thì mũi chân chạm đất trước kế đứng như hình chuẩn bị.</em> (Hình 43).",
+    "212": "<strong>YẾU LÝ:</strong> Khi co chân (<em>gối</em>) hạ thấp xuống khum khum như ngồi chồm hổm thì chân buông lỏng tự nhiên, hai tay cũng di chuyển nhẹ nhàng. Lúc hít hơi thóp bụng thì khí dồn lên ngực cho nhẹ phần dưới (<em>đề khí</em>) hai chân phải dồn hết sức lực nhảy vọt lên thẳng người như cây pháo. Nói cho dễ hiểu động tác nầy giống như ép cái lò so, xuống thì dằn (<em>đè</em>) cứng, buông thì nhảy cao lên. Tất cả cũng chỉ xử dụng hai đùi, do đó khi nhảy tâm cũng chú ý hai đùi. Khi rơi phải nhẹ nhàng, xong mới thở ra. Động tác co chân lại thì chậm chạp nhưng nhảy lên thì mau lẹ. Biết được yếu lý thì không còn sai",
+    "213": "vào đâu được nữa.",
+    "214": "<strong>Động tác 2:</strong>… <em>Co chân xuống như động tác thứ nhất hình 43 rồi nhảy lên như cây pháo thăng thiên, tay vuốt theo hai bên đùi. Rơi xuống bằng đầu hai bàn chân rồi kế mới đặt gót chân xuống</em> (Hình 45), hình 44 thế co chân nhìn từ một bên.",
+    "215": "<strong>Động tác 3 và 4:</strong>… <em>Làm lại hai lần động tác 1. Nghĩa là từ đầu đến động tác 4 làm 4 lần động tác co chân nhảy lên.</em>",
+    "216": "<strong>Động tác 5:</strong>… <em>Đứng thẳng như hình chuẩn bị, hai bàn tay từ hai bên đùi đưa xéo về sau mông đít, mũi bàn tay</em> (các đầu ngón tay trỏ, giữa, áp út và út chum lại) <em>đồng bấu vào đầu xương cùn, ngón cái bấu vào mông để kiềm cho tay khỏi sút ra (bấu chặt vừa vừa thôi) rồi nhón gót chân lên, hạ xuống. Lúc nhón lên hít hơi và hạ xuống thì thở ra. Nhón lên giữ chân nhón gót tức chân thẳng cứng đùi trong</em>",
+    "217": "<em>6 giây đồng hồ, hai bàn tay bấu đít bất động.</em> (Hình 46-47).",
+    "218": "<strong>Động tác 6:</strong>… <em>Lại nhón gót lên, hạ gót chân xuống như động tác</em> 5…",
+    "219": "<strong>Động tác 7 và 8:</strong> <em>Làm lại hai lần như động tác 5. Tức động tác 5-6-7-8 làm giống nhau một kiểu, nhón gót bấu đít.</em> Tập lại 3 lần từ đầu chí cuối.",
+    "220": "<strong>YẾU LÝ:</strong> Động tác 1 hay bốn động tác đầu của đoạn nầy nhằm làm dãn toàn diện thân mình từ dưới lên trên, lại dụng ý làm thức tỉnh các kinh mạch chính yếu trong châu thân như hai kinh Nhâm và Đốc để thích hợp cho các động tác kế tiếp là thúc đẩy khí lực lưu thông trọn vẹn trong hai kinh. Đây là cách bày biện hay dọn cỗ bàn chờ khách tới cũng đúng.",
+    "221": "Từ động tác 5 đến động tác 8 hoàn toàn chủ trương bấu vào xương cùn, bấu từng hồi, liên tục 4 cái liên tiếp. Cái bấu tay nhằm gây chấn động đến hai kinh Nhâm và Đốc là hai kinh chính yếu của con người, một kinh mang nhiều trách nhiệm bảo toàn sinh mạng cũng như năng lực…",
+    "222": "Do mỗi lần nhón chân lên, hạ chân xuống, đầu hai bàn tay khích động thức tỉnh hai đầu kinh Đốc, kinh từ đầu xương cùn chạy theo sống lưng lên đỉnh đầu và tới trước nhân trung (<em>dưới mũi</em>). Một kinh chủ định việc hòa hợp các chức vụ của các cơ quan trong mình. Nhâm kinh khởi đầu từ cuối đường chỉ dưới bộ phận sinh dục gần hậu môn (<em>lỗ đít</em>) lên tới dưới cằm, chạy theo đường lông phân ranh trước bụng, ngực, cổ, cằm. Chính nó cũng giữ vai trò dung hợp một số hoạt động của các phần trong châu thân. Sự va chạm từng hồi theo nhịp 6 giây đồng hồ của mũi bàn tay trên hai đầu dây kinh nầy thúc đẩy khí lực lưu thông, và khi đã thông được hai kinh quan trọng nầy thì mọi bệnh được tiêu trừ và nguồn năng lực của con người sẽ trở nên mãnh liệt không thể diễn tả cho hết được. Trong cuốn Nội Công Thiếu Lâm Tự đã giảng rõ việc khai mở hai kinh nầy bằng hô hấp theo Vòng Châu Thiên là trình độ cao thuộc môn <em>tĩnh</em> luyện. Ở đây thuộc <em>động</em> luyện nhằm khơi động (<em>kích thích</em>) gây chấn động đả thông, dù không phải là phương pháp toàn hảo nhưng vẫn có giá trị cấp tốc và dễ dàng. Một đàng khai mở kinh chính yếu theo đường lối tiệm tiến (<em>tiến dần từ gốc ra ngọn</em>) còn một đằng đi từ ngọn vào gốc, hết các ngọn cũng tới gốc, dù không tổng hợp nhất thời nhưng khi đả thông được mọi kinh mạch thì thân thể cũng đạt đến chỗ cường kiện trường thọ vậy.",
+    "223": "Sự bấu từng chập nhờ nhón lên hạ xuống làm vang dội tận cùng trên hai kinh. Tốt hơn, hễ mỗi lần hạ chân xuống thì thắt hậu môn (<em>nhíu đít</em>) một cái cho tăng sự thức tỉnh hai kinh. Nên biết ngày xưa trước khi về nhà chồng các bà mẹ khôn ngoan đều dạy con gái mình những phương pháp vệ sinh thường thức như làm sao cho chồng ham mê sinh lý, ham mê vừa phải khi gặp người chồng lạnh nhạt, hoặc làm sao giảm bớt cường độ ham muốn tình dục quá độ của người chồng bằng khoa cho ăn uống… trong việc dạy vệ sinh giao hoan bà mẹ dạy khi nào người chồng bất tỉnh nhân sự trên mình vợ lúc lâm trận thì dùng trâm cài đầu hay móc tai, (<em>lông nhím</em>) châm vào đầu xương cùn chồng sau khi sờ khám cẩn thận, châm thật chính xác, gọn lẹ và ngón tay cầm đầu trâm không quá một phân tây, chớ chẳng nên xô chồng ngã xuống vì sợ sệt. Ngày nay ít người biết mặc dù khoa học văn minh hơn. Đó là châm cứu huyệt của kinh Tích Tủy làm thức tỉnh mọi cơ năng làm hồi tỉnh người đánh mất sinh khí lực nhất thời trong cơn xúc cảm. (<em>Người dâm dục quá độ mà thân thể bạc</em>",
+    "224": "<em>nhược mới bị chứng này, bạc nhược đây không có nghĩa là thân thể gầy ốm mà là tinh thần bạc nhược, một người khí lực thiếu sự lưu thông và sự thừa lượng, ăn không ngồi rồi thiếu vận động, mới đây báo chí đăng rộ, vị Hồng Y bên Tây chết trong nhà gái mãi dâm cũng do chứng nầy</em>).",
+    "225": "Sự xúc cảm đột ngột và quá mạnh làm ngưng các hoạt động của các kinh nên gây sự bất đắc kỳ tử, mà hai kinh chủ yếu là kinh Nhâm và Đốc. Theo các bác sĩ dã chiến (<em>bác sĩ ngoài mặt trận</em>) cho biết các chiến sĩ bị bắn trúng xương sống (<em>đứt kinh Đốc</em>) chết đột ngột thì dương vật (<em>con cu</em>) xuất tinh ướt cả quần lót. Nhiều người đàn ông (<em>đa số</em>) còn khỏe mạnh mà chết cũng xuất tinh. Người treo cổ chết cũng xuất tinh đầy quần ấy bởi sợi dây thắt trúng (<em>gút</em>) Đốc kinh sau gáy.",
+    "226": "Do sự nhạy cảm và dễ đả thông bằng lối kích thích, động tác Bát Đoạn Cẩm nầy nhằm khai thác kích động trên hai đầu kinh Nhâm Đốc nhằm tạo sự gia tăng hiệu năng tạo dựng năng lực, phát triển khí lực trong hai kinh, để xua đuổi mọi mệt mỏi suy yếu vì “<em>kém lao động</em>” ít vận động hoặc vận động sai tự nhiên. Khi hai kinh Nhâm Đốc được thúc đẩy thông suốt cùng các bộ kinh mạch khác cũng thông suốt thì thân thể suốt đời cường kiện, đã cường kiện thì trăm bệnh còn chỗ đâu vương vấn… Ấy, ý nghĩa là vậy.",
+    "227": "Sau hết điều cần được lưu ý, khi bấu vào xương cùn chớ bấu chặt liên tục mà theo với động tác nhón lên bấu vào rồi lại thả ra (<em>lơi ra</em>) từng chập. Khi xong đoạn tập thấy vùng lỗ đít tê tê (<em>the the hay mát mát</em>) như có xức dầu Nhị Thiên Đường thì đúng, còn bấu đả đời mà buông tay ra chẳng thấy cảm giác gì thì làm sai hoặc thần kinh tủy bị bệnh, nên tới bác sĩ chuyên môn hoặc thầy châm cứu nhờ coi sóc. Nên biết ít có người bị chứng liệt thần kinh tủy sống, và liệt thì con người đã hết xài, hết xài trong mọi trường hợp và mọi sự việc.",
+    "228": "Phước thay, người tập Bát Đoạn Cẩm nào cũng thấu lẽ tự nhiên sinh tồn, dồn giữ được sinh lực nên ai cũng đẹp đẽ phương phi vui tươi yêu đời, xã hội lành mạnh nếu mọi người đều ham thích môn học bổ ích nầy."
+  },
+  "note": "[Bản văn nguồn dừng ở đây. Chín thế phụ thuộc còn lại — từ Đoạn Thứ Tư đến Đoạn Thứ Mười Hai — không có trong tập tin gốc.]"
+}
