@@ -1,0 +1,19 @@
+{
+  "title": "Tủ sách",
+  "items": [
+    {
+      "id": "noi-cong-tam-phap",
+      "title": "Nội Công Tâm Pháp",
+      "author": "Giang Thanh",
+      "file": "noi-cong-tam-phap.html",
+      "rev": 1
+    },
+    {
+      "id": "bat-doan-cam",
+      "title": "Tự Luyện Bát Đoạn Cẩm Thiếu Lâm",
+      "author": "Hàng Thanh",
+      "file": "bat-doan-cam.html",
+      "rev": 1
+    }
+  ]
+}
