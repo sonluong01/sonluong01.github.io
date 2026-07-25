@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Bản gốc dùng để chuyển đổi sách. Đây là nguyên liệu, không phải tài sản của
+# app — thứ được xuất bản là file .html trong books/. Muốn lưu bản gốc thì bỏ
+# mấy dòng này đi, nhưng nhớ chúng nặng cỡ nửa MB mỗi cuốn.
+*.docx
+*.doc
+*.odt
+*.rtf
+
+# Cache pandoc + ảnh tách ra lúc chuyển đổi (xem .claude/skills/docx-to-book).
+# Dựng lại được từ file gốc bất cứ lúc nào.
+work/
+*-work/
+
+# Bytecode của script chuyển đổi
+__pycache__/
+*.py[cod]

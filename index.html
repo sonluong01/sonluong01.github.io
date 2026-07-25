@@ -1,428 +1,65 @@
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CALC</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <style>
-    .form-control:focus {
-      box-shadow: 0 0 0 0;
-      border-color: rgb(247, 166, 0);
-    }
-    .dropdown-item.active, .dropdown-item:active {
-      background-color: rgb(132, 94, 18);
-    }
-    .navbar-nav .nav-link.active, .navbar-nav .show > .nav-link {
-      color: rgb(247, 166, 0);
-    }
-    #silver a {
-      color: #c3c6cc;
-    }
-    #gold a {
-      color: #eabe30;
-    }
-    #platinum a {
-      color: #95e870;
-    }
-    #diamond a {
-      color: #2a5ef9;
-    }
-    #master a {
-      color: #e31111;
-    }
-    #conqueror a {
-      color: #ec5aa2;
-    }
-    .list-group-item.active {
-      border-color: var(--bs-list-group-border-color);
-      background-color: rgb(28, 25, 20);
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    /* Firefox */
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tủ sách</title>
+<script>
+/* apply saved theme before paint (no flash) */
+(function(){try{var s=JSON.parse(localStorage.getItem('reader-settings'));
+  if(s&&(s.theme==='dark'||s.theme==='light'))document.documentElement.setAttribute('data-theme',s.theme);
+  if(s&&s.fontSize)document.documentElement.style.setProperty('--fs',s.fontSize+'px');
+}catch(e){}})();
+</script>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#dddbd1" id="meta-theme">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tủ sách">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
 <body>
-  <div id="app" class="container" style="max-width: 680px;">
-    <nav class="navbar navbar-expand bg-body-tertiary container sticky-top">
-      <div class="container">
-        <!-- <a class="navbar-brand" href="#">Caculator</a> -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" :class="{ active : state == 'crypto' }" @click="changeState('crypto')" href="#">Crypto</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" :class="{ active : state == 'currency' }" @click="changeState('currency')" href="#">Currency</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" :class="{ active : state == 'gold' }" @click="changeState('gold')" href="#">Gold</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Ranking
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" @click="changeState('rank', 'silver')" href="#">Silver < 70$</a></li>
-                <li><a class="dropdown-item" @click="changeState('rank', 'gold')" href="#">Gold 70$ - 1k$</a></li>
-                <li><a class="dropdown-item" @click="changeState('rank', 'platinum')" href="#">Platinum 1k$ - 20k$</a></li>
-                <li><a class="dropdown-item" @click="changeState('rank', 'diamond')" href="#">Diamond 20k$ - 200k$</a></li>
-                <li><a class="dropdown-item" @click="changeState('rank', 'master',)" href="#">Master 200k$ - 1Mi$</a></li>
-                <li><a class="dropdown-item" @click="changeState('rank', 'conqueror')" href="#">Conqueror 1Mi$ - 10Mi$</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <div class="container card mt-3 text-secondary-emphasis" :class="[state == 'rank' ? 'd-none' : 'd-flex']">
-      <form class="container card-body row w-auto">
-        <div class="container col-12 col-sm-6 order-2 order-sm-1">
-          <div class="mb-3 row justify-content-center">
-            <label for="balance" class="col col-form-label">Balance</label>
-            <div class="col">
-              <input type="text" readonly class="form-control" id="balance" v-model="balance" @click="viewRank">
-            </div>
-          </div>
-          <div class="mb-3 row justify-content-center">
-            <label for="risk" class="col col-form-label">Risk</label>
-            <div class="col">
-              <input type="text" disabled class="form-control" id="risk" v-model="risk">
-            </div>
-          </div>
-          <div class="mb-3 row justify-content-center">
-            <label for="entry" class="col col-form-label">Entry Price</label>
-            <div class="col">
-              <input type="number" class="form-control" id="entry" v-model="entry">
-            </div>
-          </div>
-          <div class="row justify-content-center">
-            <label for="close" class="col col-form-label">Close Price</label>
-            <div class="col">
-              <input type="number" class="form-control" id="close" v-model="close">
-            </div>
-          </div>
-        </div>
-        <div class="container col-12 col-sm-6 border mb-3 mb-sm-0 order-1 order-sm-2">
-          <div class="mb-3 row justify-content-center">
-            <label for="leverage" class="col col-form-label">Leverage</label>
-            <div class="col">
-              <input type="text" style="color: rgb(247, 166, 0)" disabled class="form-control-plaintext" id="leverage" :value="leverage">
-            </div>
-          </div>
-          <div class="mb-3 row justify-content-center">
-            <label for="qty" class="col col-form-label">Qty</label>
-            <div class="col">
-              <input type="text" style="color: rgb(247, 166, 0)" disabled class="form-control-plaintext" id="qty" :value="qty">
-            </div>
-          </div>
-          <div class="mb-3 row justify-content-center">
-            <label for="target1" class="col col-form-label">Target 1</label>
-            <div class="col">
-              <input type="text" style="color: rgb(247, 166, 0)" disabled class="form-control-plaintext" id="target1" :value="target1">
-            </div>
-          </div>
-          <div class="row justify-content-center">
-            <label for="target2" class="col col-form-label">Target 2</label>
-            <div class="col">
-              <input type="text" style="color: rgb(247, 166, 0)" disabled class="form-control-plaintext" id="target2" :value="target2">
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="container card mt-3" :class="[state != 'rank' ? 'd-none' : 'd-flex']">
-      <div class="card-body container justify-content-center">
-        <div class="row justify-content-center text-center border border-bottom-0 p-2">
-          <div class="col display-6 fw-bold">Ranking</div>
-          <div class="col display-6 fw-bold">Level</div>
-          <div class="col display-6 fw-bold">Balance</div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'silver' ? 'd-none' : 'd-flex']" id="silver">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Silver</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in silver" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in silver" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'gold' ? 'd-none' : 'd-flex']" id="gold">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Gold</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in gold" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in gold" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'platinum' ? 'd-none' : 'd-flex']" id="platinum">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Platinum</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in platinum" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in platinum" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'diamond' ? 'd-none' : 'd-flex']" id="diamond">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Diamond</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in diamond" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in diamond" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'master' ? 'd-none' : 'd-flex']" id="master">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Master</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in master" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in master" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row text-center border align-items-center" :class="[rank != 'conqueror' ? 'd-none' : 'd-flex']" id="conqueror">
-          <div class="col">
-            <h4><a href="#" class="list-group-item list-group-item-action">Conqueror</a></h4>
-          </div>
-          <div class="col border-start">
-            <div class="row list-group list-group-flush border-end">
-              <a v-for="r in conqueror" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.id }}
-              </a>
-            </div>
-          </div>
-          <div class="col">
-            <div class="row list-group list-group-flush">
-              <a v-for="r in conqueror" :key="r.id" @click="changeBalance(r.balance)" href="#" class="list-group-item list-group-item-action" :class="{active : r.balance == balance}">
-                {{ r.balance }}$
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-    const { createApp } = Vue
 
-    createApp({
-      data() {
-        return {
-          state: 'crypto',
-          entry: '',
-          close: '',
-          rank: '',
-          _balance: ''
-        }
-      },
-      computed: {
-        balance() {
-          if (this._balance == '') {
-            let r = localStorage.getItem("balance") || 175
-            localStorage.setItem("balance", r)
-            this._balance = parseFloat(r)
-          }
-          return this._balance
-        },
-        ratio() {
-          let r = localStorage.getItem("ratio") || 5
-          localStorage.setItem("ratio", r)
-          return parseFloat(r)
-        },
-        multi() {
-          let r = localStorage.getItem("multi") || 1.5
-          localStorage.setItem("multi", r)
-          return parseFloat(r)
-        },
-        risk() {
-          return Math.floor(this.balance * this.ratio / 100 * 100) / 100
-        },
-        qty() {
-          if ((this.entry == this.close) || (this.entry == '' || this.close == '')) {
-            return '--'
-          }
-          return Math.floor(Math.abs(this.risk / (this.close - this.entry)) * 1000000) / 1000000
-        },
-        target1() {
-          if ((this.entry == this.close) || (this.entry == '' || this.close == '')) {
-            return '--'
-          }
-          return Math.floor((this.entry + (this.entry - this.close)) * 1.0011 * 1000000) / 1000000
-        },
-        target2() {
-          if ((this.entry == this.close) || (this.entry == '' || this.close == '')) {
-            return '--'
-          }
-          return Math.floor((this.entry + (this.entry - this.close) * 2) * 1.0011 * 1000000) / 1000000
-        },
-        leverage() {
-          if ((this.entry == this.close) || (this.entry == '' || this.close == '')) {
-            return '--'
-          }
-          return Math.floor(Math.abs(this.entry / (this.close - this.entry)) * 1000000) / 1000000
-        },
-        start() {
-          let t = [[0, 5]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        silver() {
-          let t =[[1, 6.5], [2, 8.75], [3, 12.13], [4, 17.19], [5, 24.78], [6, 36.17], [7, 53.26]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        gold() {
-          let t =[[1, 78.89], [2, 117.33], [3, 175], [4, 261.49], [5, 391.24], [6, 585.86], [7, 877.79]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        platinum() {
-          let t =[[1, 1315.68], [2, 1972.52], [3, 2957.78], [4, 4435.68], [5, 6652.51], [6, 9977.77], [7, 14965.66]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        diamond() {
-          let t =[[1, 22447.48], [2, 33670.22], [3, 50504.34], [4, 75755.50], [5, 113632.26], [6, 170447.39]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        master() {
-          let t =[[1, 255670.08], [2, 383504.12], [3, 575255.18], [4, 862881.77], [5, 1294321.65]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        conqueror() {
-          let t =[[1, 1941481.47], [2, 2912221.21], [3, 4368330.82], [4, 6552495.23], [5, 9828741.84]]
-          let r = []
-          for (let i=0; i<t.length; i++) {
-            r.push({"id": t[i][0], "balance": t[i][1]})
-          }
-          return r
-        },
-        currentRank() {
-          if (this.balance <= 5) {
-            return 'start'
-          }
-          if (this.balance > 5 && this.balance < 70) {
-            return 'silver'
-          }
-          if (this.balance >= 70 && this.balance < 1000) {
-            return 'gold'
-          }
-          if (this.balance >= 1000 && this.balance < 20000) {
-            return 'platinum'
-          }
-          if (this.balance >= 20000 && this.balance < 200000) {
-            return 'diamond'
-          }
-          if (this.balance >= 20000 && this.balance < 1500000) {
-            return 'master'
-          }
-          if (this.balance > 1500000 && this.balance < 10000000) {
-            return 'conqueror'
-          }
-        },
-      },
-      methods: {
-        changeState(state, rank) {
-          this.state = state
-          if(typeof rank === 'undefined') {
-            return
-          }
-          this.rank = rank
-        },
-        changeBalance(balance) {
-          localStorage.setItem("balance", balance)
-          this._balance = balance
-          this.state = 'crypto'
-        },
-        viewRank() {
-          this.state = 'rank'
-          this.rank = this.currentRank
-        }
-      }
-    }).mount('#app')
-  </script>
+<!-- ===== Library ===== -->
+<section id="view-library" class="view">
+  <header class="lib-top">
+    <h1 id="libTitle">Tủ sách</h1>
+  </header>
+  <nav id="crumb" class="crumb" hidden></nav>
+  <div id="bookGrid" class="book-grid"></div>
+  <p id="libEmpty" class="lib-empty" hidden>Đang tải danh sách sách…</p>
+</section>
+
+<!-- ===== Reader ===== -->
+<section id="view-reader" class="view" hidden>
+  <div id="topbar-progress"><i></i></div>
+  <main id="content">
+    <div class="prose" id="prose"></div>
+    <nav class="chapnav">
+      <button id="prevCh">‹ Chương trước</button>
+      <button id="nextCh">Chương sau ›</button>
+    </nav>
+  </main>
+</section>
+
+<!-- ===== Bottom sheet (reader controls + chapters) ===== -->
+<div id="hint" hidden>Chạm vào màn hình để mở mục lục</div>
+<div id="overlay"></div>
+<nav id="sheet" aria-label="Điều khiển đọc">
+  <div class="grab"></div>
+  <div class="sheet-head"><span id="sheetTitle">Mục lục</span><span id="sheetPct">0%</span></div>
+  <div id="sheetBar"><i></i></div>
+  <div class="actions">
+    <button data-act="library"><span class="ic">≡</span><span>Tủ sách</span></button>
+    <button data-act="theme"><span class="ic" id="themeIc">🌙</span><span>Sáng/Tối</span></button>
+    <button data-act="fsdown"><span class="ic">A−</span><span>Nhỏ</span></button>
+    <button data-act="fsup"><span class="ic">A＋</span><span>To</span></button>
+  </div>
+  <ul id="chapterList"></ul>
+</nav>
+
+<script src="app.js"></script>
 </body>
 </html>
