@@ -208,9 +208,11 @@ function setFont(delta){
 }
 
 /* ---------- bìa ---------- */
-/* tông đất/ấm cho hợp màu accent; chữ trên bìa luôn là màu giấy sáng */
-const COVERS = [['#4a2c14','#8a5a2b'], ['#3b2230','#7a3f52'], ['#5a2318','#a8543a'],
-                ['#2f3320','#636b34'], ['#402a12','#9c7226'], ['#252831','#4f5867']];
+/* Trung tính như phần còn lại của giao diện; phân biệt các cuốn bằng sắc độ
+   chứ không bằng màu. Chữ trên bìa luôn là màu giấy sáng.
+   Sắc độ tối nhất vẫn phải sáng hơn nền tối (#272729), nếu không bìa chìm vào trang. */
+const COVERS = [['#37373c','#54545b'], ['#42424a','#63636d'], ['#4d4d57','#72727e'],
+                ['#3c3c42','#5b5b64'], ['#484851','#6a6a76'], ['#535360','#7c7c8b']];
 function coverStyle(title){ let h = 0; for (const c of title) h = (h*31 + c.charCodeAt(0)) >>> 0;
   const [a,b] = COVERS[h % COVERS.length]; return `background:linear-gradient(150deg,${a},${b})`; }
 function initials(title){
