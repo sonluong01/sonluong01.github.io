@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Bước 2: plan JSON -> fragment HTML cho books/.
+"""Bước 2: plan JSON -> thư mục sách books/<id>/ (toc.json + mỗi chương một file).
 
     python3 build_book.py plans/ten-sach.json [--check]
 
 Plan chỉ là bản đồ "block số mấy đóng vai gì", nên sửa cấu trúc sách là sửa
 JSON rồi chạy lại — không phải sửa HTML 400 KB bằng tay. --check dựng ra rồi
-so với file đang có, không ghi đè (dùng để kiểm tra plan còn tái tạo đúng).
+so với thư mục đang có, không ghi đè (dùng để kiểm tra plan còn tái tạo đúng).
 
 Xem SKILL.md cho toàn bộ khoá của plan.
 """
@@ -22,6 +22,24 @@ from docxbook import (SOFT_HYPHEN, data_uri, flatten, media_index, plain,
                       source_to_raw, tokenize_images)
 
 TOKEN = re.compile(r'\x00IMG(\d+)\x00')
+
+
+def split_chapters(doc):
+    """Cắt fragment HTML thành chương theo <h2> đầu dòng (h2 = chương, h3 = mục
+    trong chương). Nội dung đứng trước <h2> đầu tiên thành chương "Mở đầu".
+    Ghép lại toàn bộ các phần thì ra đúng `doc` — không mất một byte nào."""
+    parts = [p for p in re.split(r'(?m)^(?=<h2[ >])', doc) if p.strip()]
+    chapters = []
+    for part in parts:
+        m = re.match(r'<h2[^>]*>(.*?)</h2>', part, re.S)
+        if m:
+            title = re.sub(r'\s+', ' ',
+                           H.unescape(re.sub(r'<[^>]+>', '', m.group(1)))).strip()
+            title = title or 'Phần %d' % (len(chapters) + 1)
+        else:
+            title = 'Mở đầu'
+        chapters.append({'title': title, 'html': part})
+    return chapters
 
 
 def build(plan, plan_dir, source=None):
@@ -170,14 +188,20 @@ def main():
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     doc, blocks, img_order, suspect = build(plan, plan_path.parent, a.source)
 
-    out_path = pathlib.Path(plan['output'])
-    if not out_path.is_absolute():
-        out_path = (plan_path.parent / out_path).resolve()
+    out_dir = pathlib.Path(plan['output'])          # thư mục books/<id>
+    if not out_dir.is_absolute():
+        out_dir = (plan_path.parent / out_dir).resolve()
 
-    titles = re.findall(r'<h2>(.*?)</h2>', doc)
-    print('%d chương:' % len(titles))
-    for k, t in enumerate(titles):
-        print('  %2d  %s' % (k, t))
+    chapters = split_chapters(doc)
+    files = ['%03d.html' % (k + 1) for k in range(len(chapters))]
+    toc = json.dumps(
+        {'chapters': [{'title': c['title'], 'file': f}
+                      for c, f in zip(chapters, files)]},
+        ensure_ascii=False, indent=2) + '\n'
+
+    print('%d chương:' % len(chapters))
+    for k, c in enumerate(chapters):
+        print('  %2d  %s' % (k, c['title']))
 
     text = plain(re.sub(r'<img[^>]*>', '', doc))
     left = [m.group(0) for m in re.finditer(r'.{0,45}\?.{0,12}', text)]
@@ -186,8 +210,8 @@ def main():
         print('   ', s.replace('\n', ' '))
     print('(mỗi dấu phải là câu hỏi thật — còn lại là chữ chưa phục hồi)')
 
-    if len(titles) < 2:
-        print('\nCẢNH BÁO: dưới 2 thẻ h2 — splitChapters() sẽ không tách được chương.')
+    if len(chapters) < 2:
+        print('\nCẢNH BÁO: dưới 2 thẻ h2 — cả cuốn dồn thành một chương duy nhất.')
 
     if suspect:
         print('\nCẢNH BÁO: %d block dài đang nằm trong "drop" — tiêu đề thì ngắn,'
@@ -195,13 +219,25 @@ def main():
         for i, t in suspect:
             print('   %4d  %s…' % (i, t[:70]))
 
+    def read(p):
+        return p.read_text(encoding='utf-8') if p.exists() else None
+
     if a.check:
-        old = out_path.read_text(encoding='utf-8') if out_path.exists() else None
-        print('\n--check:', 'KHỚP' if old == doc else 'KHÁC file đang có', out_path)
+        same = read(out_dir / 'toc.json') == toc and all(
+            read(out_dir / f) == c['html'] for c, f in zip(chapters, files))
+        print('\n--check:', 'KHỚP' if same else 'KHÁC thư mục đang có', out_dir)
         return
-    out_path.write_text(doc, encoding='utf-8')
-    print('\nđã ghi %s (%d byte)' % (out_path, out_path.stat().st_size))
-    print('Nhớ thêm mục vào books/library.json (id, title, author, file, rev).')
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for stale in out_dir.glob('*.html'):            # dựng lại ít chương hơn thì dọn file thừa
+        if stale.name not in files:
+            stale.unlink()
+    for c, f in zip(chapters, files):
+        (out_dir / f).write_text(c['html'], encoding='utf-8')
+    (out_dir / 'toc.json').write_text(toc, encoding='utf-8')
+    total = sum((out_dir / f).stat().st_size for f in files)
+    print('\nđã ghi %s (%d chương, %d byte)' % (out_dir, len(chapters), total))
+    print('Nhớ thêm mục vào books/library.json (id, title, author, dir, rev).')
 
 
 if __name__ == '__main__':

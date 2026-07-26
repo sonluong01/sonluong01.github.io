@@ -1,6 +1,7 @@
 /* Tủ sách — offline app-shell cache */
-const CACHE = 'reader-v11';
-// Vỏ app + catalog. File sách được cache lazily khi mở lần đầu (xem fetch handler).
+const CACHE = 'reader-v12';
+// Vỏ app + catalog. Chương sách (books/<dir>/*.html?v=rev) được cache lazily khi
+// tải lần đầu (xem fetch handler); rev mới = URL mới nên không cần bump CACHE.
 const ASSETS = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/maskable-512.png',

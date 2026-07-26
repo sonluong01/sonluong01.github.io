@@ -76,7 +76,7 @@ nối lại bản xuống dòng theo dòng in.
 | Khoá | Ý nghĩa |
 | --- | --- |
 | `source` | đường dẫn .docx (tương đối so với file plan). Ghi đè bằng `--source` |
-| `output` | file HTML sẽ ghi, thường `../../../../books/<id>.html` |
+| `output` | **thư mục** sách sẽ ghi (`toc.json` + mỗi chương một file `NNN.html`), thường `../../../../books/<id>` |
 | `work` | thư mục cache pandoc. Cứ để `"../work"` — xem [Bước 3](#bước-3--dựng-và-ghi-vào-tủ-sách) |
 | `title`, `byline`, `cover`, `cover_caption` | chương đầu làm trang bìa; `cover` là số IMG |
 | `chapters` | `{"19": "Chương Thứ Nhất"}` — chèn `<h2>` **trước** block 19 |
@@ -92,9 +92,10 @@ nối lại bản xuống dòng theo dòng in.
 
 ### Chia chương thế nào
 
-`splitChapters()` trong [app.js](../../../app.js) chọn **cấp heading nông nhất
-xuất hiện từ 2 lần trở lên**. Cho nên: `h2` = chương, `h3` = mục trong chương.
-Đừng dùng `h1`.
+`split_chapters()` trong [build_book.py](scripts/build_book.py) cắt sách thành
+file theo thẻ **`<h2>`** — mỗi `h2` mở một chương, ghi thành một file riêng trong
+thư mục sách, tiêu đề vào `toc.json`. Cho nên: `h2` = chương, `h3` = mục trong
+chương. Đừng dùng `h1`.
 
 Chương là đơn vị lưu tiến độ và là một lần cuộn trên điện thoại, nên cắt theo
 cái người ta thực sự đọc một hơi. Sách võ có tám thế thì tám thế là tám chương,
@@ -255,10 +256,10 @@ một đoạn văn. Soi kỹ mấy cảnh báo đó.
 
 Nếu file .docx đã dọn đi mà `work/` còn thì vẫn dựng lại được từ cache — kể cả
 nguồn PDF, lúc đó `python3` trần cũng chạy được vì không phải gọi tới `pymupdf`
-nữa. `--check` dựng ra rồi so với file đang có, không ghi — dùng để xác nhận
-plan còn tái tạo đúng cuốn sách sau khi sửa script. Sửa `docxbook.py` hay
-`pdfbook.py` thì `--check` **cả mấy cuốn đã có**: khớp từng byte mới là không
-làm hỏng sách cũ.
+nữa. `--check` dựng ra rồi so với thư mục sách đang có (toc.json + từng file
+chương), không ghi — dùng để xác nhận plan còn tái tạo đúng cuốn sách sau khi
+sửa script. Sửa `docxbook.py` hay `pdfbook.py` thì `--check` **cả mấy cuốn đã
+có**: khớp từng byte mới là không làm hỏng sách cũ.
 
 Muốn vậy thì `work` phải trỏ vào **`"../work"`** (tức `skills/docx-to-book/work/`,
 đã có trong `.gitignore`). Mặc định cache nằm cạnh file .docx, mà .docx thì là
@@ -269,13 +270,15 @@ thì cache sống chung với plan, xoá .docx bao nhiêu lần cũng không sao
 Rồi thêm mục vào [books/library.json](../../../books/library.json):
 
 ```json
-{ "id": "<id>", "title": "…", "author": "…", "file": "<id>.html", "rev": 1,
+{ "id": "<id>", "title": "…", "author": "…", "dir": "<id>", "rev": 1,
   "desc": "Sách nói về cái gì, mở đầu ra sao, đi tới đâu.\nBản nguồn thiếu/đứt chỗ nào." }
 ```
 
 `id` là khoá của tiến độ đọc **và** của URL — đổi `id` là xoá sạch tiến độ của
-người đọc. Về sau mỗi lần sửa nội dung file sách phải **tăng `rev`**, không thì
-client vẫn dùng bản chương đã tách trong IndexedDB và không thấy gì thay đổi.
+người đọc. Tiến độ và dấu ✓ lưu theo **chỉ số chương**, nên chèn/xoá/đảo chương
+của sách đã phát hành là làm lệch tiến độ người đọc — sửa chữ trong chương thì
+vô hại. Về sau mỗi lần sửa nội dung sách phải **tăng `rev`**, không thì client
+vẫn dùng bản chương đã cache trong IndexedDB và không thấy gì thay đổi.
 
 `desc` là đoạn giới thiệu ở trang sách. Viết sau khi đã đọc `blocks.txt`, nên nó
 phải nói được cuốn này dạy gì và dừng ở đâu — hai đoạn ngăn bằng `\n`: đoạn đầu
@@ -296,7 +299,8 @@ xuống còn "Phần Đạo" thì gõ "đạo đức kinh" vẫn ra. Đổi `tit
 `rev` thì bản cache trong IndexedDB còn giữ tên cũ — chỉ lộ ra ở hộp thoại
 "Đọc lại …" và màn hình lúc mất mạng, còn danh sách online luôn lấy từ catalog.
 
-Không cần đụng `sw.js`: `library.json` đi network-first, file sách cache lazily.
+Không cần đụng `sw.js`: `library.json` đi network-first, chương sách cache lazily
+theo URL `?v=rev` — tăng `rev` là client tự lấy bản mới.
 
 ## Kiểm lại
 

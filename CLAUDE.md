@@ -11,8 +11,8 @@ mục — không có nút "thêm sách", không import file, không upload. Vi�
 app ghi lại là **tiến độ đọc** (chương đang đọc, vị trí cuộn, chương đã đọc), lưu
 trong `localStorage` của từng máy.
 
-Nếu có yêu cầu "thêm sách" → sửa `library.json` + đặt file HTML vào `books/`, chứ
-không thêm UI vào app.
+Nếu có yêu cầu "thêm sách" → sửa `library.json` + đặt một thư mục chương vào
+`books/` (xem cấu trúc bên dưới), chứ không thêm UI vào app.
 
 ## Run it
 
@@ -22,27 +22,38 @@ python3 -m http.server 8000     # rồi mở http://localhost:8000
 
 Bắt buộc HTTP thật — `file://` làm hỏng `fetch()` catalog, service worker và manifest.
 
-## books/library.json
+## books/: mỗi cuốn một thư mục, mỗi chương một file
+
+```
+books/
+  library.json                    ← catalog
+  noi-cong-tam-phap/
+    toc.json                      ← { "chapters": [ { "title": "…", "file": "001.html" }, … ] }
+    001.html … 009.html           ← fragment HTML của từng chương (không <html>/<head>)
+```
+
+Thứ tự trong `toc.json` chính là chỉ số chương — **chèn/xoá/đảo chương làm lệch
+tiến độ và dấu ✓ đã lưu** (chúng lưu theo chỉ số), sửa nội dung một chương thì không.
 
 ```json
 {
   "title": "Tủ sách",
   "items": [
     { "id": "noi-cong-tam-phap", "title": "Nội Công Tâm Pháp", "author": "Giang Thanh",
-      "file": "noi-cong-tam-phap.html", "rev": 1 },
+      "dir": "noi-cong-tam-phap", "rev": 3 },
     { "type": "folder", "id": "kiem-hiep", "title": "Kiếm hiệp",
-      "items": [ { "id": "tlbb", "title": "Thiên Long Bát Bộ", "file": "tlbb.html" } ] }
+      "items": [ { "id": "tlbb", "title": "Thiên Long Bát Bộ", "dir": "tlbb" } ] }
   ]
 }
 ```
 
-- `file` — đường dẫn tương đối trong `books/`. Bắt buộc với sách.
+- `dir` — tên thư mục sách trong `books/`. Bắt buộc với sách.
 - `id` — **khoá của tiến độ đọc và của URL**. Đổi `id` = mất tiến độ của người đọc.
-  Thiếu thì tự suy từ tên file (sách) hoặc tiêu đề (thư mục).
-- `rev` — **bump khi sửa nội dung file sách**, nếu không client vẫn dùng bản chương
-  đã tách trong cache. Mặc định 1. Sửa file sách thì phải bump **cả** `rev` **lẫn**
-  `CACHE` trong [sw.js](sw.js): `rev` dọn cache chương trong IndexedDB, còn file
-  `.html` thì service worker đi cache-first nên không bump `CACHE` là vẫn ăn bản cũ.
+  Thiếu thì tự suy từ `dir` (sách) hoặc tiêu đề (thư mục).
+- `rev` — **bump khi sửa nội dung sách** (toc.json hay file chương), nếu không
+  client vẫn dùng bản đã cache. Mặc định 1. Chỉ cần bump `rev`: app fetch nội dung
+  với `?v=rev` nên rev mới tự vượt qua cache-first của service worker; `CACHE`
+  trong [sw.js](sw.js) chỉ dành cho vỏ app.
 - `desc` — giới thiệu sách, hiện ở tab **Giới thiệu** của trang sách. Không bắt buộc;
   xuống dòng bằng `\n`.
 - Thư mục lồng nhau tuỳ ý (giới hạn 8 cấp), nhận diện qua `type:"folder"` hoặc có `items`.
@@ -54,8 +65,8 @@ Bắt buộc HTTP thật — `file://` làm hỏng `fetch()` catalog, service wo
 | [index.html](index.html) | Toàn bộ DOM: thư viện, trang sách, trình đọc, bottom sheet. Script inline trong `<head>` áp theme/cỡ chữ trước khi vẽ (chống nháy) — phải khớp với `applyTheme`/`applyFont`. |
 | [app.js](app.js) | Catalog → thư viện → trang sách → trình đọc → tiến độ. Hash router. |
 | [style.css](style.css) | ~300 KB nhưng **chỉ ~230 dòng cuối là CSS thật** — phía trên là font Nunito nhúng base64. Nhảy qua chúng; đừng bao giờ format lại file. |
-| [sw.js](sw.js) | Cache vỏ app. `library.json` đi **network-first** (nếu không sách mới không bao giờ hiện); file sách cache lazily. Bump `CACHE` mỗi lần đổi asset. |
-| [books/](books/) | `library.json` + các file `.html` nội dung. |
+| [sw.js](sw.js) | Cache vỏ app. `library.json` đi **network-first** (nếu không sách mới không bao giờ hiện); file chương cache lazily theo URL `?v=rev`. Bump `CACHE` mỗi lần đổi asset vỏ app. |
+| [books/](books/) | `library.json` + mỗi cuốn một thư mục (`toc.json` + chương). |
 
 ## Lưu trữ
 
@@ -63,8 +74,10 @@ Bắt buộc HTTP thật — `file://` làm hỏng `fetch()` catalog, service wo
   - `reader-progress` = `{ [bookId]: { i, ratio, read: [chỉ số chương], updatedAt } }`
   - `reader-settings` = `{ theme, fontSize }`
 - **IndexedDB chỉ là cache**, xoá lúc nào cũng được:
-  - `books` = `{ id, rev, title, author, nCh, toc }` — kết quả tách chương
-  - `chapters` = `{ key: bookId+'::'+i, bookId, i, title, html }`
+  - `books` = `{ id, rev, title, author, dir, nCh, toc: [{title, file}] }` — toc.json đã tải
+  - `chapters` = `{ key: bookId+'::'+i, bookId, i, title, html }` — chương tải khi cần
+    (`fetchChapter()`); mở sách trong trình đọc thì `prefetchBook()` tải nốt phần còn
+    lại trong nền để đọc offline được trọn cuốn.
   - Vô hiệu khi `rev` trong catalog khác `rev` đã cache; `pruneCache()` dọn sách đã
     biến khỏi catalog. `DB_VER` = 1.
 
@@ -73,10 +86,9 @@ cuộn quá nửa, hoặc ngay lập tức nếu chương ngắn tới mức kh�
 
 ## Conventions that matter
 
-- **Mọi truy cập IndexedDB đi qua `op()` / `putChapters()`.** Chúng resolve khi
-  transaction *complete*, và tạo transaction sau khi db promise đã settled. Đừng
-  `await` giữa lúc mở transaction và dùng store — transaction sẽ inactive và ghi
-  hỏng im lặng.
+- **Mọi truy cập IndexedDB đi qua `op()`.** Nó resolve khi transaction *complete*,
+  và tạo transaction sau khi db promise đã settled. Đừng `await` giữa lúc mở
+  transaction và dùng store — transaction sẽ inactive và ghi hỏng im lặng.
 - **Điều hướng chỉ bằng hash:** `#/book/<id>` = trang sách (giới thiệu + mục lục),
   `#/read/<id>[/<chương>]` = trình đọc, `#/folder/<id>` = thư mục, `''` = gốc. Đổi
   view bằng cách gán `location.hash` rồi để `route()` lo. Đừng vừa gọi `openBook()`

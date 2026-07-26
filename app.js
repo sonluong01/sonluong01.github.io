@@ -1,16 +1,17 @@
 /* ===================================================================
    Tủ sách — trình đọc sách/truyện (vanilla JS, no build)
 
-   Nội dung nằm trên server:
-     books/library.json  — định nghĩa thư mục + danh sách sách
-     books/<file>.html   — nội dung từng cuốn
-   App chỉ lo: hiển thị, tách chương (có cache), và LƯU TIẾN ĐỘ ĐỌC.
+   Nội dung nằm trên server, mỗi cuốn một thư mục, mỗi chương một file:
+     books/library.json        — định nghĩa thư mục + danh sách sách
+     books/<dir>/toc.json      — mục lục: tiêu đề + file của từng chương
+     books/<dir>/<NNN>.html    — nội dung từng chương
+   App chỉ lo: hiển thị, tải chương khi cần (có cache), và LƯU TIẾN ĐỘ ĐỌC.
    =================================================================== */
 
 const CATALOG_URL = 'books/library.json';
 const BOOKS_DIR   = 'books/';
 
-/* ---------- IndexedDB: chỉ dùng làm cache chương đã tách ---------- */
+/* ---------- IndexedDB: chỉ dùng làm cache chương đã tải ---------- */
 const DB_NAME = 'reader', DB_VER = 1;
 let dbPromise = null;
 function openDB(){
@@ -42,18 +43,8 @@ const getCache  = id => op('books', 'readonly',  s => s.get(id));
 const allCache  = ()  => op('books', 'readonly',  s => s.getAll());
 const putCache  = m  => op('books', 'readwrite', s => s.put(m));
 const getChapter = (bookId, i) => op('chapters', 'readonly', s => s.get(bookId + '::' + i));
-
-async function putChapters(bookId, chapters){
-  const db = await openDB();
-  return new Promise((res, rej) => {
-    const t = db.transaction('chapters', 'readwrite');
-    const st = t.objectStore('chapters');
-    chapters.forEach((c, i) => st.put({ key: bookId + '::' + i, bookId, i, title: c.title, html: c.html }));
-    t.oncomplete = () => res();
-    t.onerror    = () => rej(t.error);
-    t.onabort    = () => rej(t.error);
-  });
-}
+const putChapter = (bookId, i, c) => op('chapters', 'readwrite',
+  s => s.put({ key: bookId + '::' + i, bookId, i, title: c.title, html: c.html }));
 async function dropCache(id){
   await op('books', 'readwrite', s => s.delete(id));
   await op('chapters', 'readwrite', st => {
@@ -85,24 +76,24 @@ const slug = s => norm(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') ||
 
 /* ===================================================================
    Catalog: books/library.json
-   { "items": [ {id,title,author,file,rev},
+   { "items": [ {id,title,author,dir,rev},
                 {type:"folder", id, title, items:[...]} ] }
    Làm phẳng thành danh sách có `parent` để render và định tuyến.
    =================================================================== */
-let flat = [];            // [{id, title, folder, parent, file?, author?, rev?}]
+let flat = [];            // [{id, title, folder, parent, dir?, author?, rev?}]
 let catalogError = null;
 
 function flatten(node, parent, out, seen, depth){
   for (const raw of (node.items || [])) {
     const isFolder = raw.type === 'folder' || Array.isArray(raw.items);
-    if (!isFolder && !raw.file) { console.warn('Bỏ qua mục thiếu "file":', raw); continue; }
-    let id = raw.id || slug(isFolder ? raw.title : raw.file.replace(/\.[^.]+$/, ''));
+    if (!isFolder && !raw.dir) { console.warn('Bỏ qua mục thiếu "dir":', raw); continue; }
+    let id = raw.id || slug(isFolder ? raw.title : raw.dir);
     while (seen.has(id)) id += '-2';        // id phải duy nhất: nó là khoá của tiến độ + URL
     seen.add(id);
     const item = { id, title: raw.title || id, folder: isFolder, parent: parent || null };
     out.push(item);
     if (isFolder) { if (depth < 8) flatten(raw, id, out, seen, depth + 1); }
-    else { item.file = raw.file; item.author = raw.author || ''; item.rev = raw.rev || 1;
+    else { item.dir = raw.dir; item.author = raw.author || ''; item.rev = raw.rev || 1;
            item.desc = raw.desc || ''; }
   }
 }
@@ -147,45 +138,50 @@ function pathOf(id){
   return path;
 }
 
-/* ---------- tách chương ---------- */
-function splitChapters(html, fallbackTitle){
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const body = doc.body;
-  // chọn cấp heading nông nhất xuất hiện ít nhất 2 lần
-  let level = null;
-  for (const tag of ['h1','h2','h3']) { if (body.querySelectorAll(tag).length >= 2) { level = tag; break; } }
-  if (!level) for (const tag of ['h1','h2','h3']) { if (body.querySelectorAll(tag).length === 1) { level = tag; break; } }
+/* ---------- tải sách: toc.json + từng chương ----------
+   `?v=rev` trên mọi URL nội dung: service worker đi cache-first, nên rev mới
+   phải ra URL mới thì client mới thấy bản mới — khỏi phải bump CACHE. */
 
-  const chapters = [];
-  let cur = null;
-  const push = t => { cur = { title: t, nodes: [] }; chapters.push(cur); };
-  for (const node of Array.from(body.children)) {
-    const tag = node.tagName ? node.tagName.toLowerCase() : '';
-    if (level && tag === level) {
-      push((node.textContent || '').trim() || ('Phần ' + (chapters.length + 1)));
-      cur.nodes.push(node);
-    } else {
-      if (!cur) push('Mở đầu');
-      cur.nodes.push(node);
-    }
-  }
-  if (!chapters.length) { push(fallbackTitle || 'Nội dung'); cur.nodes = Array.from(body.children); }
-  return chapters.map(c => ({ title: c.title, html: c.nodes.map(n => n.outerHTML).join('\n') }));
-}
-
-/* Trả về meta {id, rev, title, author, nCh, toc}; tải + tách + cache nếu cần.
-   `rev` trong library.json đổi → cache cũ bị dựng lại. */
+/* Trả về meta {id, rev, title, author, dir, nCh, toc:[{title,file}]}; chỉ tải
+   toc.json — chương thì fetchChapter() lo từng cái khi cần.
+   `rev` trong library.json đổi → dọn chương đã cache rồi tải lại mục lục. */
 async function ensureBook(entry){
   const cached = await getCache(entry.id).catch(() => null);
   if (cached && cached.rev === entry.rev && cached.nCh) return cached;
-  const r = await fetch(BOOKS_DIR + entry.file);
-  if (!r.ok) throw new Error('Không tải được ' + entry.file + ' (HTTP ' + r.status + ')');
-  const chapters = splitChapters(await r.text(), entry.title);
+  if (cached) await dropCache(entry.id).catch(() => {});   // rev đổi: chương cũ hết giá trị
+  const r = await fetch(BOOKS_DIR + entry.dir + '/toc.json?v=' + entry.rev);
+  if (!r.ok) throw new Error('Không tải được mục lục của ' + entry.dir + ' (HTTP ' + r.status + ')');
+  const toc = (await r.json()).chapters || [];
+  if (!toc.length) throw new Error('toc.json của ' + entry.dir + ' không có chương nào');
   const meta = { id: entry.id, rev: entry.rev, title: entry.title, author: entry.author,
-                 nCh: chapters.length, toc: chapters.map(c => ({ title: c.title })) };
-  await putChapters(entry.id, chapters);
+                 dir: entry.dir, nCh: toc.length, toc };
   await putCache(meta);
   return meta;
+}
+
+/* Một chương: cache IndexedDB trước, thiếu mới ra mạng. */
+async function fetchChapter(meta, i){
+  const hit = await getChapter(meta.id, i).catch(() => null);
+  if (hit) return hit;
+  const c = meta.toc[i];
+  const r = await fetch(BOOKS_DIR + meta.dir + '/' + c.file + '?v=' + meta.rev);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const ch = { title: c.title, html: await r.text() };
+  await putChapter(meta.id, i, ch).catch(() => {});
+  return ch;
+}
+
+/* Tải nốt các chương còn thiếu trong nền, để cuốn đang đọc đọc được offline
+   trọn vẹn như thời cả sách một file. Mỗi cuốn một lượt; đứt mạng thì thôi,
+   lần mở sau tải tiếp. */
+const prefetching = new Set();
+async function prefetchBook(meta){
+  if (prefetching.has(meta.id)) return;
+  prefetching.add(meta.id);
+  try {
+    for (let i = 0; i < meta.nCh; i++) await fetchChapter(meta, i);
+  } catch {}
+  finally { prefetching.delete(meta.id); }
 }
 
 /* ---------- theme + font ---------- */
@@ -568,6 +564,7 @@ async function openBook(id, at){
   const jump = typeof at === 'number';
   buildChapterList();
   await loadChapter(Math.max(0, Math.min(jump ? at : (p.i || 0), meta.nCh - 1)), jump ? 0 : (p.ratio || 0));
+  prefetchBook(meta);                     // chạy nền cho các chương còn lại
   showHint();
 }
 
@@ -578,12 +575,18 @@ function chapterLabel(toc, i){
   return 'Chương ' + (i + 1) + (t ? ': ' + t : '');
 }
 
+let loadToken = 0;
 async function loadChapter(i, ratio){
   if (cancelRestore) cancelRestore();
-  const ch = await getChapter(R.id, i);
+  const meta = R.meta, token = ++loadToken;
+  let ch = null;
+  try { ch = await fetchChapter(meta, i); } catch {}
+  // trong lúc chờ mạng người đọc có thể đã đổi chương / rời sách
+  if (token !== loadToken || R.meta !== meta) return;
   R.i = i;
   resetEdge();
-  prose().innerHTML = ch ? ch.html : '<p>Không tải được chương này.</p>';
+  prose().innerHTML = ch ? ch.html
+    : '<p class="loading">Không tải được chương này.<br><small>Kiểm tra mạng rồi chọn lại chương trong mục lục.</small></p>';
   const label = chapterLabel(R.meta.toc, i);
   $('#sheetTitle').textContent = label;
   $('#rTitle').textContent = label;
@@ -596,8 +599,9 @@ async function loadChapter(i, ratio){
   else updateProgress();
   // Chương ngắn tới mức không cuộn được thì coi như đã đọc.
   // Đợi 600ms cho ảnh dàn xong, nếu không chương toàn ảnh sẽ bị đánh dấu oan.
+  // Chương không tải được thì đừng đánh dấu — màn hình lỗi cũng "không cuộn được".
   clearTimeout(shortChTimer);
-  shortChTimer = setTimeout(() => { if (R.i === i && !scrollable()) markRead(i); }, 600);
+  if (ch) shortChTimer = setTimeout(() => { if (R.i === i && !scrollable()) markRead(i); }, 600);
 }
 
 /* Đặt lại vị trí cuộn đã lưu cho tới khi trang (kể cả ảnh) ổn định.
