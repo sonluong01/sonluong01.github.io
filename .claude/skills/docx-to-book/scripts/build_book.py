@@ -18,8 +18,8 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from docxbook import (SOFT_HYPHEN, data_uri, extract_media, flatten,
-                      media_index, plain, run_pandoc, tokenize_images)
+from docxbook import (SOFT_HYPHEN, data_uri, flatten, media_index, plain,
+                      source_to_raw, tokenize_images)
 
 TOKEN = re.compile(r'\x00IMG(\d+)\x00')
 
@@ -43,8 +43,7 @@ def build(plan, plan_dir, source=None):
         if not docx.exists():
             raise SystemExit('không thấy %s và cũng không có cache trong %s\n'
                              'chỉ đường tới file docx bằng --source' % (docx, work))
-        raw = run_pandoc(docx, raw_path)
-        extract_media(docx, media)
+        raw, media, _ = source_to_raw(docx, raw_path, media)
     raw, img_order = tokenize_images(raw, media_index(media))
     blocks = flatten(raw)
 
@@ -114,10 +113,20 @@ def build(plan, plan_dir, source=None):
                 i += 1
                 continue
 
+        # Các block quote liền nhau là một đoạn trích liền mạch (nguyên văn
+        # chữ Hán-Việt, một bài thơ), nên gộp vào chung một <blockquote> —
+        # để rời thì mỗi dòng thành một khối có gạch lề riêng, đọc rất gãy.
         if i in quote:
-            out.append('<blockquote>\n  <p>%s</p>\n</blockquote>'
-                       % re.sub(r'</?p>', '', txt))
-            i += 1
+            parts, j = [re.sub(r'</?p>', '', txt)], i + 1
+            while j < n and j in quote and j not in drop \
+                    and j not in chapters and j not in sections \
+                    and blocks[j][2] and blocks[j][2].strip() \
+                    and '\x00' not in blocks[j][2]:
+                parts.append(re.sub(r'</?p>', '', blocks[j][2]))
+                j += 1
+            out.append('<blockquote>\n%s\n</blockquote>'
+                       % '\n'.join('  <p>%s</p>' % p for p in parts))
+            i = j
             continue
 
         if tag == 'li':

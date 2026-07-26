@@ -32,6 +32,22 @@ def run_pandoc(docx, out_html):
     return pathlib.Path(out_html).read_text(encoding='utf-8')
 
 
+def source_to_raw(src, raw_path, media_dir):
+    """Nguồn (docx/pdf/...) -> (raw_html, thư_mục_ảnh, [ghi chú]).
+
+    Một cửa duy nhất cho cả hai nhánh, để inspect và build luôn nhìn thấy cùng
+    một fragment. PDF đi qua pdfbook.py (nét vector phải render ra PNG), còn
+    lại đi qua pandoc.
+    """
+    src = pathlib.Path(src)
+    if src.suffix.lower() == '.pdf':
+        from pdfbook import pdf_to_html
+        raw, media, dropped = pdf_to_html(src, raw_path, media_dir)
+        return raw, media, dropped
+    raw = run_pandoc(src, raw_path)
+    return raw, extract_media(src, media_dir), []
+
+
 def extract_media(docx, media_dir):
     """Giải nén word/media/* để xem ảnh và tra ngược data-uri -> tên file."""
     media_dir = pathlib.Path(media_dir)

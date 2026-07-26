@@ -14,6 +14,27 @@
       "author": "Hàng Thanh",
       "file": "bat-doan-cam.html",
       "rev": 1
+    },
+    {
+      "type": "folder",
+      "id": "dao-duc-kinh",
+      "title": "Lão Tử — Đạo Đức Kinh",
+      "items": [
+        {
+          "id": "dao-duc-kinh-phan-dao",
+          "title": "Phần Đạo (chương 1–37)",
+          "author": "Nguyễn Hiến Lê dịch",
+          "file": "dao-duc-kinh-phan-dao.html",
+          "rev": 1
+        },
+        {
+          "id": "dao-duc-kinh-phan-duc",
+          "title": "Phần Đức (chương 38–81)",
+          "author": "Nguyễn Hiến Lê dịch",
+          "file": "dao-duc-kinh-phan-duc.html",
+          "rev": 1
+        }
+      ]
     }
   ]
 }

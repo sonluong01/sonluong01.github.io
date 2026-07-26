@@ -12,8 +12,11 @@ description: >
 
 # docx → sách cho tủ sách
 
-Việc này gần như không bao giờ là "chạy pandoc rồi xong". Sách trong tủ này hầu
-hết là sách in cũ được đánh máy hoặc quét lại, nên file .docx tới tay ta thường:
+Việc này gần như không bao giờ là "chạy pandoc rồi xong". Nguồn tới tay ta có hai
+kiểu, hỏng theo hai cách khác hẳn nhau — soi ra được kiểu nào là biết trước sẽ
+phải vật lộn với cái gì.
+
+**Sách in cũ đánh máy hoặc quét lại** (mẫu: [bat-doan-cam](plans/bat-doan-cam.json)):
 
 - **không có heading thật** — tên chương chỉ là đoạn văn in đậm, còn Heading 1/2
   của Word thì rỗng hoặc đặt bừa;
@@ -24,6 +27,13 @@ hết là sách in cũ được đánh máy hoặc quét lại, nên file .docx 
   làm rụng sạch dải CP1252 (`à á â ã ê í ó ô ú ý`, dấu `…`, ngoặc kép cong) và
   thay bằng `?`;
 - **đứt đoạn giữa chừng** ở chỗ sang trang của sách in.
+
+**Bản chép từ web** (mẫu: [dao-duc-kinh-phan-duc](plans/dao-duc-kinh-phan-duc.json)):
+chữ nghĩa thường sạch — không rụng ký tự, không ảnh, không heading bừa. Đổi lại
+nó **xuống dòng theo từng dòng in**: mỗi dòng là một `<p>` riêng, để nguyên thì
+cả cuốn đọc như thơ vụn. Kèm theo là rụng dấu câu cuối dòng, dính chữ
+(`tứcvạn`), và front matter sai (dòng đề mục ghi "tới câu 61" trong khi sách
+chạy tới 81).
 
 Nên quy trình là ba bước: **soi → viết plan → dựng**. Plan là một file JSON nói
 "block số mấy đóng vai gì". Sửa sách về sau là sửa plan rồi chạy lại, chứ không
@@ -49,19 +59,21 @@ mỗi ảnh ứng với "Hình" số mấy để đặt figcaption.
 
 ## Bước 2 — viết plan
 
-Đặt trong `.claude/skills/docx-to-book/plans/<id-sách>.json`. Xem
-[plans/bat-doan-cam.json](plans/bat-doan-cam.json) làm mẫu đầy đủ.
+Đặt trong `.claude/skills/docx-to-book/plans/<id-sách>.json`.
+[bat-doan-cam.json](plans/bat-doan-cam.json) là mẫu đầy đủ nhất (ảnh, `sections`,
+`rewrite`); [dao-duc-kinh-phan-duc.json](plans/dao-duc-kinh-phan-duc.json) là mẫu
+nối lại bản xuống dòng theo dòng in.
 
 | Khoá | Ý nghĩa |
 | --- | --- |
 | `source` | đường dẫn .docx (tương đối so với file plan). Ghi đè bằng `--source` |
 | `output` | file HTML sẽ ghi, thường `../../../../books/<id>.html` |
-| `work` | thư mục cache pandoc (mặc định cạnh file docx) |
+| `work` | thư mục cache pandoc. Cứ để `"../work"` — xem [Bước 3](#bước-3--dựng-và-ghi-vào-tủ-sách) |
 | `title`, `byline`, `cover`, `cover_caption` | chương đầu làm trang bìa; `cover` là số IMG |
 | `chapters` | `{"19": "Chương Thứ Nhất"}` — chèn `<h2>` **trước** block 19 |
 | `sections` | như trên nhưng `<h3>` |
 | `drop` | block bỏ hẳn: dòng tiêu đề đã hoá thành h2/h3, heading rỗng, ô bảng rỗng |
-| `quote` | block render thành `<blockquote>` — câu khẩu quyết, thơ, đề từ |
+| `quote` | block render thành `<blockquote>` — câu khẩu quyết, thơ, đề từ. Các block quote **liền nhau gộp chung một khối**, nên cứ liệt kê từng dòng của một bài thơ hay một đoạn nguyên văn |
 | `merge` | block `i` dán vào cuối block `i-1` (nối đoạn bị ngắt trang) |
 | `captions` | `{"IMG2": "Hình 10 – 11 – 12"}` |
 | `drop_images` | `["IMG5"]` — ảnh chèn lót 1×1, ảnh rác |
@@ -80,6 +92,45 @@ cái người ta thực sự đọc một hơi. Sách võ có tám thế thì t�
 đừng gom cả tám vào một "Chương Thứ Nhì" chỉ vì sách in ghi thế — người đọc
 muốn đánh dấu "đã xong Đệ Tam Đoạn Cẩm", không phải "đã đọc 37% chương 3".
 
+Nhãn chương nhiều khi phải tự đặt: bản nguồn chỉ để số trần `1`, `2`, `3`. Đặt
+thì đặt theo cách gọi quen của cuốn sách đó ("Chương 12" cho Đạo Đức Kinh), và
+**báo lại là mình đã tự đặt** — nhất là khi bản nguồn dùng từ khác (nó gọi là
+"câu", ta ghi "Chương").
+
+### Cấu trúc đều thì sinh plan bằng script
+
+Sách 44 chương mà ngồi chép 44 con số vào JSON thì chỉ cần lệch một số là mất
+trắng một đoạn. Nhận ra tên chương bằng luật được — block chỉ có mỗi con số,
+block in đậm, block mở đầu bằng "Chương" — thì viết mấy dòng Python đọc
+`*-raw.html` qua `flatten()` của [scripts/docxbook.py](scripts/docxbook.py) rồi
+`json.dump` thẳng ra plan. Cả hai cuốn Đạo Đức Kinh sinh kiểu đó, `chapters`,
+`quote`, `merge` không gõ tay chữ nào.
+
+Sinh xong vẫn phải in ra soát: đủ số chương chưa, dãy số có liên tục không
+(`38..81`), có block nào rơi ra ngoài mọi vai trò không. Script sinh sai thì sai
+đều và im lặng — chính vì vậy mới phải kiểm bằng mắt.
+
+### Nối lại bản xuống dòng theo dòng in
+
+Với bản chép web, `merge` không còn là vá vài chỗ sang trang mà là dựng lại toàn
+bộ đoạn văn. Luật này chạy tốt cho tiếng Việt:
+
+> nối block `i` vào `i-1` khi block `i` **bắt đầu bằng chữ thường**, hoặc block
+> `i-1` **kết bằng `,` `;` `:`**. Còn lại là đoạn mới.
+
+Xét hoa/thường ở ký tự chữ đầu tiên **sau khi bỏ `“ ( [` mở đầu**, nhờ vậy
+`(vì nắm được chân lí)` nối đúng vào câu trước, mà `“Ta không dám làm chủ` sau
+dấu `:` cũng nối đúng. Đừng lấy "dòng trước đã có dấu chấm chưa" làm luật chính —
+bản chép web rụng dấu chấm cuối dòng như cơm bữa, tin vào nó là dính hai câu.
+
+**Bắt buộc soát ranh giới.** In ra hai loại đáng ngờ rồi đọc từng dòng một:
+
+- chỗ **nối** mà dòng trước không có dấu câu nào → phải đúng là câu chưa dứt;
+- chỗ **tách** mà dòng trước thiếu dấu chấm → phải đúng là hết câu.
+
+Phần Đức có 16 chỗ loại một, 4 chỗ loại hai; đọc hết mất vài phút và đó chính là
+chỗ luật suýt sai. Không soát thì không có cách nào biết mình nối đúng hay sai.
+
 ### Chữ hỏng
 
 Nếu inspect báo hàng trăm `?`, đối chiếu theo quy luật: chỉ những ký tự thuộc
@@ -95,12 +146,38 @@ dùng nghiêng để phân biệt phần mô tả động tác với phần lu�
 Đừng đoán bừa cho xong. Chỗ nào không chắc, cứ chọn phương án hợp lý nhất rồi
 **báo lại cho người dùng danh sách những chỗ đã suy đoán** để họ soát khi đọc.
 
+### Mấy phép soi rẻ tiền
+
+Chạy trên text đã qua `plain()`, mỗi phép vài dòng Python, lần nào cũng nên chạy —
+`inspect_docx.py` không bắt mấy loại này:
+
+| Tìm | Bắt được |
+| --- | --- |
+| `\w[.,;:]\w` | thiếu dấu cách sau dấu câu (`được.Nhồi`, `phác,tuy`) |
+| `[^\W\d_]{6,}`, trừ danh sách âm tiết dài hợp lệ (`thường`, `nghiêng`, `chuyển`…) | dính chữ (`tứcvạn` = `tức vạn`) |
+| `?` mà chữ ngay sau viết thường | `?` không phải dấu hỏi |
+
+Cái thứ ba khác hẳn chuyện rụng CP1252 ở trên: `“lợi khí” quyền mưu? thì quốc gia`
+không phải câu hỏi — dấu `?` đó nuốt mất dấu `)`. Còn `?` cuối câu thì
+`build_book.py` in hết ra rồi, đọc lại từng cái xem có phải câu hỏi thật không.
+
 ### Những gì không được tự tiện làm
 
 Giữ đúng chính tả và giọng văn của bản gốc, kể cả từ cũ và lỗi nhỏ của tác giả
 (`chum lại`, `xử dụng`) — đây là sách in lại, không phải bài viết cần biên tập.
 Nếu bản nguồn thiếu hình hay đứt ngang, **nói rõ trong `note`**, tuyệt đối không
 viết bù phần thiếu.
+
+Ranh giới là: **lỗi cơ học thì sửa, chữ nghĩa thì không.** Thiếu dấu cách, dính
+chữ, `?` nuốt mất `)` — rác của vòng chép, sửa bằng `replace` rồi báo lại một
+dòng. Còn `nhà cần quyền`, `thu thuế nặng nặng`, `ẩn náo` — có thể là lỗi đánh
+máy mà cũng có thể là chữ của bản in; không có bản gốc trong tay thì **để nguyên
+và liệt kê cho người dùng**, đừng tự quyết thay họ.
+
+Front matter sai cũng xử theo lối đó. Phần Đức có dòng đề mục ghi "từ câu 38 tới
+câu 61" trong khi chính văn chạy đủ tới 81: không sửa thầm, mà cũng không để
+nguyên cho người đọc tưởng sách thiếu — bỏ khỏi thân sách, ghi khoảng đúng vào
+`byline`, nói rõ đầu đuôi trong `note`.
 
 ## Bước 3 — dựng và ghi vào tủ sách
 
@@ -117,6 +194,12 @@ Nếu file .docx đã dọn đi mà `work/` còn thì vẫn dựng lại đượ
 `--check` dựng ra rồi so với file đang có, không ghi — dùng để xác nhận plan còn
 tái tạo đúng cuốn sách sau khi sửa script.
 
+Muốn vậy thì `work` phải trỏ vào **`"../work"`** (tức `skills/docx-to-book/work/`,
+đã có trong `.gitignore`). Mặc định cache nằm cạnh file .docx, mà .docx thì là
+nguyên liệu tạm — dọn nó đi là mất luôn cache, plan hoá ra không dựng lại được
+nữa. Lúc đó phải đi tìm lại bản .docx rồi chạy với `--source`. Còn để `../work`
+thì cache sống chung với plan, xoá .docx bao nhiêu lần cũng không sao.
+
 Rồi thêm mục vào [books/library.json](../../../books/library.json):
 
 ```json
@@ -126,6 +209,20 @@ Rồi thêm mục vào [books/library.json](../../../books/library.json):
 `id` là khoá của tiến độ đọc **và** của URL — đổi `id` là xoá sạch tiến độ của
 người đọc. Về sau mỗi lần sửa nội dung file sách phải **tăng `rev`**, không thì
 client vẫn dùng bản chương đã tách trong IndexedDB và không thấy gì thay đổi.
+
+Bộ nhiều tập thì gom vào thư mục, tên sách rút ngắn cho khỏi lặp tên bộ:
+
+```json
+{ "type": "folder", "id": "dao-duc-kinh", "title": "Lão Tử — Đạo Đức Kinh",
+  "items": [ { "id": "dao-duc-kinh-phan-dao", "title": "Phần Đạo (chương 1–37)", … },
+             { "id": "dao-duc-kinh-phan-duc", "title": "Phần Đức (chương 38–81)", … } ] }
+```
+
+Gom vào thư mục **không** đụng `id` nên tiến độ đọc còn nguyên, và tìm kiếm cũng
+không mất gì: `searchBooks()` gộp cả tên thư mục vào chuỗi tìm, nên rút tên sách
+xuống còn "Phần Đạo" thì gõ "đạo đức kinh" vẫn ra. Đổi `title` mà không tăng
+`rev` thì bản cache trong IndexedDB còn giữ tên cũ — chỉ lộ ra ở hộp thoại
+"Đọc lại …" và màn hình lúc mất mạng, còn danh sách online luôn lấy từ catalog.
 
 Không cần đụng `sw.js`: `library.json` đi network-first, file sách cache lazily.
 

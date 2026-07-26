@@ -14,18 +14,19 @@ In ra màn hình bản báo cáo: heading, ảnh, hư hỏng mã hoá, đoạn b
 """
 import argparse
 import collections
+import json
 import pathlib
 import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from docxbook import (SOFT_HYPHEN, extract_media, flatten, media_index, plain,
-                      run_pandoc, tokenize_images)
+from docxbook import (SOFT_HYPHEN, flatten, media_index, plain, source_to_raw,
+                      tokenize_images)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('docx')
+    ap.add_argument('docx', help='.docx (hoặc .pdf, .odt, .rtf, .epub)')
     ap.add_argument('--work', default=None, help='thư mục tạm (mặc định: cạnh file docx)')
     a = ap.parse_args()
 
@@ -35,8 +36,8 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
 
     raw_path = work / (stem + '-raw.html')
-    raw = run_pandoc(docx, raw_path)
-    media = extract_media(docx, work / (stem + '-media'))
+    raw, media, dropped = source_to_raw(docx, raw_path, work / (stem + '-media'))
+    raw_text = raw
     raw, img_order = tokenize_images(raw, media_index(media))
     blocks = flatten(raw)
 
@@ -114,6 +115,26 @@ def main():
         print('   ứng viên cho plan["merge"] (block i dán vào cuối block i-1):')
         print('   %s' % cont)
         print('   kiểm lại từng cái trong blocks.txt trước khi tin')
+
+    # ---- riêng cho PDF ----
+    if docx.suffix.lower() == '.pdf':
+        from pdfbook import caption_hints
+        hints = caption_hints(media, raw_text)
+        if hints:
+            hint_path = work / (stem + '-captions.json')
+            hint_path.write_text(
+                json.dumps(hints, ensure_ascii=False, indent=2) + '\n',
+                encoding='utf-8')
+            print('\n--- chú thích hình suy từ số hiệu in trên hình ---')
+            print('   %d hình có số; chép vào plan["captions"]: %s'
+                  % (len(hints), hint_path))
+            print('   %s' % list(hints.items())[:4])
+        if dropped:
+            print('\n--- chữ bị nuốt vào vùng hình (%d dòng) ---' % len(dropped))
+            print('   phần lớn phải là số hiệu hình; câu văn lọt vào đây là mất chữ:')
+            for pg, t in dropped:
+                if not re.fullmatch(r'[\d\sA-Za-z.,–-]{0,12}', t):
+                    print('   trang %-3d %s' % (pg, t[:80]))
 
     print('\nBước tiếp: viết plan JSON (xem SKILL.md), rồi chạy build_book.py')
 
