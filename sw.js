@@ -1,5 +1,5 @@
 /* Tủ sách — offline app-shell cache */
-const CACHE = 'reader-v7';
+const CACHE = 'reader-v8';
 // Vỏ app + catalog. File sách được cache lazily khi mở lần đầu (xem fetch handler).
 const ASSETS = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.json',

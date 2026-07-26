@@ -26,15 +26,35 @@
 <section id="view-library" class="view">
   <header class="lib-top">
     <h1 id="libTitle">Tủ sách</h1>
+    <div class="lib-actions">
+      <button id="btnSearch" class="iconbtn" title="Tìm sách" aria-label="Tìm sách">🔍</button>
+      <button id="btnSettings" class="iconbtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
+    </div>
   </header>
+  <div id="searchBar" class="searchbar" hidden>
+    <input id="searchInput" type="search" autocomplete="off" spellcheck="false"
+           placeholder="Tìm theo tên sách, tác giả, thư mục…" aria-label="Tìm sách">
+    <button id="searchClose" class="iconbtn" title="Đóng tìm kiếm" aria-label="Đóng tìm kiếm">✕</button>
+  </div>
+  <div id="tabs" class="tabs">
+    <button data-tab="history" class="on">Lịch sử</button>
+    <button data-tab="browse">Tủ sách</button>
+  </div>
+  <p id="searchNote" class="search-note" hidden></p>
   <nav id="crumb" class="crumb" hidden></nav>
-  <div id="bookGrid" class="book-grid"></div>
+  <div id="bookList" class="book-list"></div>
   <p id="libEmpty" class="lib-empty" hidden>Đang tải danh sách sách…</p>
 </section>
 
 <!-- ===== Reader ===== -->
 <section id="view-reader" class="view" hidden>
-  <div id="topbar-progress"><i></i></div>
+  <header id="rtop">
+    <button id="rBack" class="ricon" title="Về tủ sách" aria-label="Về tủ sách">‹</button>
+    <span id="rTitle"></span>
+    <span id="rPct">0%</span>
+    <button id="rMenu" class="ricon" title="Mục lục" aria-label="Mục lục">⚙</button>
+    <div id="topbar-progress"><i></i></div>
+  </header>
   <main id="content">
     <div class="prose" id="prose"></div>
     <nav class="chapnav">
@@ -45,7 +65,8 @@
 </section>
 
 <!-- ===== Bottom sheet (reader controls + chapters) ===== -->
-<div id="hint" hidden>Chạm vào màn hình để mở mục lục</div>
+<div id="hint" hidden>Chạm để mở mục lục · kéo quá cuối trang để sang chương</div>
+<div id="edge" class="edge" hidden></div>
 <div id="overlay"></div>
 <nav id="sheet" aria-label="Điều khiển đọc">
   <div class="grab"></div>
@@ -56,9 +77,20 @@
     <button data-act="theme"><span class="ic" id="themeIc">🌙</span><span>Sáng/Tối</span></button>
     <button data-act="fsdown"><span class="ic">A−</span><span>Nhỏ</span></button>
     <button data-act="fsup"><span class="ic">A＋</span><span>To</span></button>
+    <button data-act="reset"><span class="ic">🗑</span><span>Đọc lại</span></button>
   </div>
   <ul id="chapterList"></ul>
 </nav>
+
+<!-- ===== Menu chung (⋮ của sách, ⚙ cài đặt) ===== -->
+<div id="menu" class="menu" hidden>
+  <div class="menu-bg"></div>
+  <div class="menu-card">
+    <div id="menuTitle" class="menu-title"></div>
+    <div id="menuList" class="menu-list"></div>
+    <button id="menuCancel" class="menu-cancel">Đóng</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
