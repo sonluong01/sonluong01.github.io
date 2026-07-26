@@ -208,8 +208,9 @@ function setFont(delta){
 }
 
 /* ---------- bìa ---------- */
-const COVERS = [['#12332e','#2f6f63'], ['#3a2c1e','#7a5230'], ['#242a45','#45568a'],
-                ['#3a2438','#7d3c98'], ['#402024','#a83a2e'], ['#20323a','#357d8a']];
+/* tông đất/ấm cho hợp màu accent; chữ trên bìa luôn là màu giấy sáng */
+const COVERS = [['#4a2c14','#8a5a2b'], ['#3b2230','#7a3f52'], ['#5a2318','#a8543a'],
+                ['#2f3320','#636b34'], ['#402a12','#9c7226'], ['#252831','#4f5867']];
 function coverStyle(title){ let h = 0; for (const c of title) h = (h*31 + c.charCodeAt(0)) >>> 0;
   const [a,b] = COVERS[h % COVERS.length]; return `background:linear-gradient(150deg,${a},${b})`; }
 function initials(title){
@@ -391,7 +392,7 @@ function settingsMenu(){
   const n = Object.keys(progress).length;
   showMenu('Cài đặt', [
     { label: effTheme() === 'dark' ? '☀️ Giao diện sáng' : '🌙 Giao diện tối', run: toggleTheme },
-    { label: '↻ Tải lại danh sách sách', run: async () => {
+    { label: '↻ Tải lại danh sách', run: async () => {
       await loadCatalog(); renderLibrary();
       toast(catalogError ? 'Không tải được danh sách.' : 'Đã cập nhật danh sách sách.');
     } },
