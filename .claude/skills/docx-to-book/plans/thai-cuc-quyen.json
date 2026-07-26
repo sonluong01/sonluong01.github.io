@@ -1,0 +1,127 @@
+{
+  "source": "../../../../../../Downloads/thai_cuc_quyen.pdf",
+  "output": "../../../../books/thai-cuc-quyen.html",
+  "work": "../work",
+  "title": "Võ Đang Thái Cực Quyền",
+  "byline": "Trương-Tam-Phong — Thầy Dương-Trừng-Phủ soạn ; Cư sĩ Giáo sư Hàng-Thanh dịch và xuất bản, Trung Thu năm Giáp Dần",
+
+  "chapters": {
+    "4": "Mục Lục",
+    "26": "Lời Nói Đầu",
+    "39": "Cận Sử Môn Thái-Cực-Quyền",
+    "73": "Chương Thứ Nhất — Thái-Cực-Quyền Yếu Lĩnh",
+    "114": "Thái Cực Quyền Thập Yếu",
+    "145": "Chương Thứ Nhì — Danh Xưng Quyền Thức",
+    "196": "Vài Điểm Liên Quan Tới Đồ Giải",
+    "212": "Thức 1 — Thức Dự Bị",
+    "217": "Thức 2 — Khởi Thức",
+    "228": "Thức 3 — Lãm Tước Vĩ (Bằng, Phúc, Tề, Án)",
+    "334": "Thức 4 — Đơn Tiên",
+    "346": "Thức 5 — Đề Thủ Thượng Thế",
+    "357": "Thức 6 — Bạch Hạc Lượng Xí",
+    "364": "Thức 7 — Lâu Tất Ảo Bộ",
+    "376": "Thức 8 — Thủ Huy Tỳ Bà",
+    "381": "Thức 9 — Tả Hữu Lâu Tất Ảo Bộ",
+    "398": "Thức 10 — Thủ Huy Tỳ Bà",
+    "402": "Thức 11 — Tả Lâu Tất Ảo Bộ",
+    "404": "Thức 12 — Tấn Bộ Ban Lan Trùy",
+    "418": "Thức 13 — Như Phong Tự Bế",
+    "426": "Thức 14 — Thập Tự Thủ",
+    "433": "Thức 15 — Bảo Hổ Qui Sơn",
+    "454": "Thức 16 — Trửu Đề Kháng Trùy",
+    "468": "Thức 17 — Tả Hữu Đảo Niện Hầu",
+    "488": "Thức 18 — Tà Phi Thức",
+    "496": "Thức 19 — Đề Thủ Thượng Thế",
+    "504": "Thức 20 — Bạch Hạc Lượng Sí",
+    "507": "Thức 21 — Lâu Tất Ảo Bộ",
+    "511": "Thức 22 — Hải Để Châm",
+    "520": "Thức 23 — Phiến Thông Bối",
+    "528": "Thức 24 — Phiết Thân Trùy",
+    "538": "Thức 25 — Tấn Bộ Ban Lan Trùy",
+    "549": "Thức 26 — Thượng Bộ Lãm Tước Vĩ",
+    "555": "Thức 27 — Đơn Tiên",
+    "560": "Thức 28 — Vân Thủ",
+    "589": "Thức 29 — Đơn Tiên",
+    "598": "Thức 30 — Cao Thám Mã",
+    "608": "Thức 31 — Tả Hữu Phân Cước",
+    "627": "Thức 32 — Chuyển Thân Đăng Cước",
+    "638": "Thức 33 — Tả Hữu Lâu Tất Ảo Bộ",
+    "643": "Thức 34 — Tấn Bộ Tài Trùy",
+    "652": "Thức 35 — Phiên Thân Phiết Thân Trùy",
+    "663": "Thức 36 — Tấn Bộ Ban Lan Trùy",
+    "667": "Thức 37 — Hữu Đăng Cước",
+    "676": "Thức 38 — Tả Đả Hổ Thức",
+    "686": "Thức 39 — Hữu Đả Hổ Thức",
+    "696": "Thức 40 — Hồi Thân, Hữu Đăng Cước"
+  },
+
+  "drop": [
+    0, 1, 2, 3, 4, 26, 27, 39, 73, 74, 114, 145, 146, 149,
+    150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164,
+    165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179,
+    180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194,
+    195, 196, 211, 212, 217,
+    273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287,
+    288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302,
+    303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317,
+    318,
+    334, 346, 357, 364, 381, 402, 404, 418, 433, 454, 468, 488, 496, 504, 506,
+    507, 511, 520, 528, 538, 549, 555, 560, 589, 598, 608, 627, 638, 643, 652,
+    663, 667, 676, 686, 696
+  ],
+
+  "merge": [
+    47, 49, 51, 53, 70, 86, 87, 134, 203, 205, 247, 248, 262, 263, 321, 343,
+    371, 372, 452, 462, 502, 532, 533, 568, 569, 576, 577, 578, 592, 606,
+    616, 617, 665, 666, 692, 693, 707
+  ],
+
+  "rewrite": {
+    "148": "<strong>DANH THỨC</strong><br>1. Thức dự bị<br>2. Khởi thức<br>3. Lãm tước vĩ<br>4. Đơn tiên<br>5. Đề thủ thượng thế<br>6. Bạch hạc lượng xí<br>7. Tả lâu tất ảo bộ<br>8. Thủ huy tỳ bà<br>9. Tả hữu lâu tất ảo bộ<br>10. Thủ huy tỳ bà<br>11. Tả lâu tất ảo bộ<br>12. Tấn bộ ban lan trùy<br>13. Như phong tự bế<br>14. Thập tự thủ<br>15. Bảo hổ qui sơn<br>16. Trửu để khán trùy<br>17. Tả hữu đảo niệm hầu<br>18. Tà phi thức<br>19. Đề thủ thượng thế<br>20. Bạch hạc lượng xí<br>21. Tả lâu tất ảo bộ<br>22. Hải để châm<br>23. Phiến thông hối<br>24. Phiết thân trùy<br>25. Tấn bộ ban lan trùy<br>26. Thượng bộ lãm tước vĩ<br>27. Đơn tiên<br>28. Vân thủ<br>29. Đơn tiên<br>30. Cao thám mã<br>31. Tả hữu phân cước<br>32. Chuyển thân đăng cước<br>33. Tả hữu lâu tất ảo bộ<br>34. Tấn bộ tài trùy<br>35. Phiên thân phiết thân trùy<br>36. Tấn bộ ban lan trùy<br>37. Hữu đặng cước<br>38. Tả đả hổ thức<br>39. Hữu đả hổ thức<br>40. Hồi thân hữu đặng cước<br>41. Song phong quán nhĩ<br>42. Tả đặng cước<br>43. Chuyển thân hữu đặng cước<br>44. Tấn bộ ban lan trùy<br>45. Như phong tự bế<br>46. Thập tự thủ<br>47. Bảo hổ qui sơn<br>48. Tà đơn tiên<br>49. Dã mã phân tung<br>50. Lãm tước vĩ<br>51. Đơn tiên<br>52. Ngọc nữ xuyên thoa<br>53. Lãm tước vĩ<br>54. Đơn tiên<br>55. Vân thủ<br>56. Đơn tiên<br>57. Hạ thế<br>58. Kim kê độc lập<br>59. Tả hữu đảo niệm hầu<br>60. Tà phi thức<br>61. Đề thủ thượng thế<br>62. Bạch hạc lượng xí<br>63. Tả lâu tất ảo bộ<br>64. Hải để châm<br>65. Phiến thông hối<br>66. Chuyển thân bạch xà thổ tín<br>67. Ban lan trùy<br>68. Lãm tước vĩ<br>69. Đơn tiên<br>70. Vân thủ<br>71. Đơn tiên<br>72. Cao thám mã đới xuyên chưởng<br>73. Thập tự thối<br>74. Tấn bộ chỉ tề trùy<br>75. Thượng bộ lãm tước vĩ<br>76. Đơn tiên<br>77. Hạ thế<br>78. Thượng bộ thất tinh<br>79. Thoái bộ khóa hổ<br>80. Chuyển thân bài liên<br>81. Loan cung xạ hổ<br>82. Tấn bộ ban lan trùy<br>83. Như phong tự bế<br>84. Thập tự thủ<br>85. Thâu thế",
+
+    "227": "<em>Khi luyện quyền đến mức khi đang luyện thì chỉ còn biết có quyền thức và tâm cuốn theo như dòng nước chảy, mọi vật chung quanh chẳng còn hình sắc, ý nghĩa, thì lúc đó coi như đạt đến giai đoạn hiểu, hòa được quyền rồi. Nhưng tiếp tục luyện cho đến khi tâm khinh linh, không mê không tỉnh, mà mọi vật biến động không gì qua khỏi thần thì tới chỗ cao tuyệt của Thái-cực quyền. Đây là kinh nghiệm riêng của soạn giả G.S Hàng-Thanh.,.</em>",
+
+    "272": "<strong>Số tt. hình / Kình điểm tay phải / Kình điểm tay trái / Bộ phận chủ yếu</strong><br>4 — Ở bên xích cốt chỗ gần cổ tay / Ở bên ngón tay út chỗ chưởng căn / Ở tay phải<br>5 — Di chuyển tới chỗ đầu xích cốt / Di chuyển tới đầu nạo cốt / Di chuyển<br>6 — Di chuyển tới bên ngón tay út chỗ chưởng căn / Di chuyển tới bên nạo cốt chỗ gần cổ tay / Ở tay trái<br>7 — Khi chưởng xoa lên, kình ở khoảng giữa của ngón trỏ và ngón cái / Khi cùi chỏ hạ trầm xuống thì kình ở chỗ chưởng căn xích cốt với ngón út / Tay phải<br>8 — Di chuyển tới bên nạo cốt / Di chuyển tới chưởng căn / Ở tay phải<br>9 — Di chuyển tới bên nạo cốt gần cổ tay / Chỗ chưởng căn / Ở tay phải<br>10 — Di chuyển tới bên ngón út chổ cổ tay / Di chuyển tới bên hổ khẩu, giữa trỏ và cái / Ở tay phải<br>11 — Di chuyển tới gần bên xích cốt chỗ cổ tay / Di chuyển tới bên nạo cốt chỗ gần cổ tay / Ở tay phải<br>12 — Di chuyển tới bên ngón út chỗ chưởng căn / Di chuyển tới giữa lòng bàn tay (giữa ngón trỏ và út) / Ở tay phải<br>13 — Di chuyển tới bên ngoài cánh tay dưới / Di chuyển tới bên ngón tay út chỗ chưởng căn / Ở 2 tay<br>14 — Di chuyển tới gần cổ tay, chỗ bên ngoài cánh tay dưới / Di chuyển tới chưởng căn (gốc bàn tay) / Ở 2 tay<br>15 — Di chuyển tới ngón tay út / Di chuyển tới ngón tay út / Ở 2 tay<br>16 — Di chuyển tới bên ngón tay út chỗ chưởng căn / Di chuyển tới ngón út chỗ chưởng căn / Ở 2 tay<br>17 — Di chuyển tới chưởng căn / Di chuyển tới chưởng căn / Ở 2 tay",
+
+    "376": "(thủ huy : tay vẩy động ; tỳ bà : loại đờn có 4 dây. Ý của thức này là tay khải đàn Tỳ Bà)",
+    "398": "(Khải đàn tỳ bà)",
+    "426": "(hai tay chéo nhau hình chữ thập)"
+  },
+
+  "_replace": "Rác đánh máy của bản in : gõ telex hụt phím (noiwchor, cngx, thaaysddoois) và dính chữ / thiếu dấu cách. Chỉ vá những chỗ chữ đó không thể là tiếng Việt ; chữ nào đọc được (úp va mũi, gối (tràn) mình) thì để nguyên.",
+  "replace": [
+    ["noiwchor", "nơi chỏ"],
+    ["trái cngx đồng", "trái cũng đồng"],
+    ["trái vwnj lên", "trái vận lên"],
+    ["thẳng howngs Đông", "thẳng hướng Đông"],
+    ["nwowngnhau", "nương nhau"],
+    ["thaaysddoois phương", "thấy đối phương"],
+    ["chẳng monggif đánh", "chẳng mong gì đánh"],
+    ["đấm ra đea tới", "đấm ra đưa tới"],
+    ["Chân trái đea về sau", "Chân trái đưa về sau"],
+    ["rồi đea tới trước", "rồi đưa tới trước"],
+    ["quyền phairt mở ra", "quyền phải mở ra"],
+    ["thì dtay dưới", "thì tay dưới"],
+    ["tay chgur tay phụ", "tay chủ tay phụ"],
+    ["gối trtais đứng thẳng", "gối trái đứng thẳng"],
+    ["chưởng hal trầm", "chưởng hạ trầm"],
+    ["thần ngĩ là động tác", "thần nghĩ là động tác"],
+    ["séc không tụ nơi gối", "sức không tụ nơi gối"],
+    ["đồngthời", "đồng thời"],
+    ["động tác,chưởng tâm", "động tác, chưởng tâm"],
+    ["đưa xuống,xuyên qua", "đưa xuống, xuyên qua"],
+    ["Vai xệ,chỏ trầm", "Vai xệ, chỏ trầm"],
+    ["động tác,thiết nghĩ", "động tác, thiết nghĩ"],
+    ["mắt thần.Phàm thì", "mắt thần. Phàm thì"],
+    ["4.Từ thức khởi đầu", "4. Từ thức khởi đầu"],
+    ["tréo nhau.(h.A)", "tréo nhau. (h.A)"]
+  ],
+
+  "captions": {
+    "IMG0": "Bóng bàn chân : a, b, c, d",
+    "IMG1": "Lộ đồ phương hướng — N : Nam, B : Bắc, Đ : Đông, T : Tây",
+    "IMG2": "Lộ đồ phương hướng — N : Nam, B : Bắc, Đ : Đông, T : Tây"
+  },
+
+  "note": "Bản nguồn (PDF quét lại bản in 1974) chỉ có tới thức 40 — Hồi thân, Hữu đăng cước ; phần còn lại của bài quyền (thức 41 đến 85 trong Danh thức), Chương Thứ Ba — Thái Cực Thôi Thủ và Chương Thứ Tư — Phụ Lục ghi trong Mục lục đều thiếu trong bản nguồn."
+}

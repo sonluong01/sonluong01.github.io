@@ -8,6 +8,8 @@
 *.doc
 *.odt
 *.rtf
+*.pdf
+*.epub
 
 # Cache pandoc + ảnh tách ra lúc chuyển đổi (xem .claude/skills/docx-to-book).
 # Dựng lại được từ file gốc bất cứ lúc nào.

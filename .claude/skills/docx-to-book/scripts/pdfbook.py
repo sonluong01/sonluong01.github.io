@@ -176,9 +176,39 @@ def _is_head(spans):
     return bool(fonts) and all('Tahoma' in f for f in fonts)
 
 
+BULLET = {'-', '–', '—', '•', '*', 'o', '+'}
+
+
+def _glue_bullets(lines):
+    """Dấu đầu dòng nằm riêng một 'dòng' -> dán vào đầu dòng chữ kế nó.
+
+    Danh sách gạch đầu dòng trong Word in ra PDF thành hai cột: dấu gạch một
+    cột, chữ một cột. Không dán lại thì cả cuốn sách rải rác những đoạn chỉ có
+    đúng một dấu "-", còn dòng chữ thì mất dấu.
+    """
+    out, pending = [], None
+    for box, spans, txt in lines:
+        if txt.strip() in BULLET:
+            pending = (box, spans, txt)
+            continue
+        if pending is not None and txt.strip():
+            box = box | pending[0]
+            # Dấu gạch đầu dòng hay được đánh đậm trong Word; giữ nguyên thì
+            # cả cuốn sách đầy những "<strong>-</strong>" chẳng để làm gì.
+            mark = [dict(s, flags=0) for s in pending[1]]
+            spans = mark + spans
+            txt = pending[2].strip() + ' ' + txt
+            pending = None
+            out.append((box, spans, txt, True))   # chắc chắn là đầu một đoạn
+            continue
+        out.append((box, spans, txt, False))
+    return out
+
+
 def _paragraphs(lines, page_rect, figs=()):
     """Dòng rời -> đoạn văn, dựa vào thụt lề dòng đầu và dòng kết thúc sớm."""
     import fitz
+    lines = _glue_bullets(lines)
     body = [l for l in lines if l[2].strip()]
     if not body:
         return []
@@ -212,11 +242,13 @@ def _paragraphs(lines, page_rect, figs=()):
 
     paras, cur, start_new = [], [], True
     prev = None
-    for box, spans, txt in lines:
+    for box, spans, txt, bullet in lines:
         if not txt.strip():               # dòng trắng: ngắt đoạn
             start_new = True
             continue
-        if prev is not None:
+        if bullet:
+            start_new = True
+        elif prev is not None:
             wrap = beside_fig(prev[0]) and beside_fig(box)
             gap = box.y0 - prev[0].y1
             indent = box.x0 > left + 12
