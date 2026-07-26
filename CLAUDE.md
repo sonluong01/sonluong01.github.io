@@ -40,15 +40,19 @@ Bắt buộc HTTP thật — `file://` làm hỏng `fetch()` catalog, service wo
 - `id` — **khoá của tiến độ đọc và của URL**. Đổi `id` = mất tiến độ của người đọc.
   Thiếu thì tự suy từ tên file (sách) hoặc tiêu đề (thư mục).
 - `rev` — **bump khi sửa nội dung file sách**, nếu không client vẫn dùng bản chương
-  đã tách trong cache. Mặc định 1.
+  đã tách trong cache. Mặc định 1. Sửa file sách thì phải bump **cả** `rev` **lẫn**
+  `CACHE` trong [sw.js](sw.js): `rev` dọn cache chương trong IndexedDB, còn file
+  `.html` thì service worker đi cache-first nên không bump `CACHE` là vẫn ăn bản cũ.
+- `desc` — giới thiệu sách, hiện ở tab **Giới thiệu** của trang sách. Không bắt buộc;
+  xuống dòng bằng `\n`.
 - Thư mục lồng nhau tuỳ ý (giới hạn 8 cấp), nhận diện qua `type:"folder"` hoặc có `items`.
 
 ## Files
 
 | File | Role |
 | --- | --- |
-| [index.html](index.html) | Toàn bộ DOM: thư viện, trình đọc, bottom sheet. Script inline trong `<head>` áp theme/cỡ chữ trước khi vẽ (chống nháy) — phải khớp với `applyTheme`/`applyFont`. |
-| [app.js](app.js) | Catalog → thư viện → trình đọc → tiến độ. Hash router. |
+| [index.html](index.html) | Toàn bộ DOM: thư viện, trang sách, trình đọc, bottom sheet. Script inline trong `<head>` áp theme/cỡ chữ trước khi vẽ (chống nháy) — phải khớp với `applyTheme`/`applyFont`. |
+| [app.js](app.js) | Catalog → thư viện → trang sách → trình đọc → tiến độ. Hash router. |
 | [style.css](style.css) | ~300 KB nhưng **chỉ ~230 dòng cuối là CSS thật** — phía trên là font Nunito nhúng base64. Nhảy qua chúng; đừng bao giờ format lại file. |
 | [sw.js](sw.js) | Cache vỏ app. `library.json` đi **network-first** (nếu không sách mới không bao giờ hiện); file sách cache lazily. Bump `CACHE` mỗi lần đổi asset. |
 | [books/](books/) | `library.json` + các file `.html` nội dung. |
@@ -73,9 +77,14 @@ cuộn quá nửa, hoặc ngay lập tức nếu chương ngắn tới mức kh�
   transaction *complete*, và tạo transaction sau khi db promise đã settled. Đừng
   `await` giữa lúc mở transaction và dùng store — transaction sẽ inactive và ghi
   hỏng im lặng.
-- **Điều hướng chỉ bằng hash:** `#/book/<id>`, `#/folder/<id>`, `''` = gốc. Đổi
+- **Điều hướng chỉ bằng hash:** `#/book/<id>` = trang sách (giới thiệu + mục lục),
+  `#/read/<id>[/<chương>]` = trình đọc, `#/folder/<id>` = thư mục, `''` = gốc. Đổi
   view bằng cách gán `location.hash` rồi để `route()` lo. Đừng vừa gọi `openBook()`
   vừa set hash ở cùng chỗ — sách sẽ load hai lần.
+- **Bấm một cuốn ở thư viện vào trang sách trước, không nhảy thẳng vào đọc.** Chỉ
+  mục "▶ Đọc tiếp" trong menu ⋮ và các nút trên trang sách mới đi `#/read/`. Số
+  chương trong hash chỉ là lệnh "mở tại đây": `route()` `replaceState` bỏ nó ngay
+  sau khi mở, để lần reload sau vẫn theo tiến độ đã lưu.
 - **UI toàn tiếng Việt.** Giữ đúng giọng văn hiện có.
 - Mọi chuỗi của người dùng/catalog phải qua `esc()` trước khi vào `innerHTML`. HTML
   của chương được chèn thô có chủ đích (nó chính là nội dung sách).
@@ -84,6 +93,8 @@ cuộn quá nửa, hoặc ngay lập tức nếu chương ngắn tới mức kh�
 
 ## Testing
 
-Không có test suite. Kiểm tra tay trên trình duyệt: mở sách, đọc vài chương, reload
+Không có test suite. Kiểm tra tay trên trình duyệt: bấm một cuốn → trang sách (số
+chương, mục lục, nút Đọc), vào đọc vài chương, bấm ‹ (phải quay về trang sách chứ
+không ra thẳng thư viện), rồi reload
 (phải nhảy lại đúng chương + vị trí, dấu ✓ còn nguyên), quay lại thư viện xem
 "đã đọc x/y chương", đổi theme/cỡ chữ, rồi ngắt mạng reload để kiểm tra service worker.

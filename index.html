@@ -49,6 +49,39 @@
   <p id="libEmpty" class="lib-empty" hidden>Đang tải danh sách sách…</p>
 </section>
 
+<!-- ===== Trang sách (giới thiệu + mục lục), đứng giữa thư viện và trình đọc ===== -->
+<section id="view-detail" class="view" hidden>
+  <div class="d-hero">
+    <div id="dHeroBg" class="d-hero-bg"></div>
+    <button id="dBack" class="d-back" title="Về tủ sách" aria-label="Về tủ sách">‹</button>
+    <div class="d-hero-in">
+      <div id="dCover" class="d-cover"></div>
+      <div class="d-head">
+        <div id="dFolder" class="d-folder" hidden></div>
+        <h2 id="dTitle"></h2>
+        <div id="dAuthor" class="d-author" hidden></div>
+        <div class="d-cta">
+          <button id="dRead" class="d-primary">Đọc truyện</button>
+          <button id="dMenu" class="d-more" title="Tuỳ chọn" aria-label="Tuỳ chọn">⋮</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="dStats" class="d-stats"></div>
+  <div id="dTabs" class="d-tabs">
+    <button data-dtab="intro" class="on">Giới thiệu</button>
+    <button data-dtab="toc">Danh sách chương</button>
+  </div>
+  <div id="dIntro" class="d-panel"></div>
+  <ul id="dChapters" class="d-chapters" hidden></ul>
+  <div id="dBottom" class="d-bottom">
+    <div class="d-bwrap">
+      <div class="d-bmain"><b id="dBotTitle"></b><span id="dBotSub"></span></div>
+      <button id="dReadBtn" class="d-primary">Đọc</button>
+    </div>
+  </div>
+</section>
+
 <!-- ===== Reader ===== -->
 <section id="view-reader" class="view" hidden>
   <header id="rtop">

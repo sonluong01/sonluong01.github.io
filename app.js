@@ -102,7 +102,8 @@ function flatten(node, parent, out, seen, depth){
     const item = { id, title: raw.title || id, folder: isFolder, parent: parent || null };
     out.push(item);
     if (isFolder) { if (depth < 8) flatten(raw, id, out, seen, depth + 1); }
-    else { item.file = raw.file; item.author = raw.author || ''; item.rev = raw.rev || 1; }
+    else { item.file = raw.file; item.author = raw.author || ''; item.rev = raw.rev || 1;
+           item.desc = raw.desc || ''; }
   }
 }
 
@@ -381,9 +382,12 @@ function bookMenu(b){
   const has = !!prog(b.id);
   showMenu(b.title, [
     { label: has ? '▶ Đọc tiếp' : '▶ Đọc từ đầu',
+      run: () => { location.hash = '#/read/' + encodeURIComponent(b.id); } },
+    currentView !== 'detail' && { label: '📖 Trang sách',
       run: () => { location.hash = '#/book/' + encodeURIComponent(b.id); } },
     has && { label: '🗑 Xoá khỏi lịch sử đọc', danger: true, run: () => {
-      delete progress[b.id]; saveProgress(); renderLibrary();
+      delete progress[b.id]; saveProgress();
+      if (currentView === 'detail' && D.id === b.id) renderDetail(b); else renderLibrary();
       toast('Đã xoá lịch sử của “' + b.title + '”.');
     } }
   ].filter(Boolean));
@@ -426,6 +430,94 @@ function closeMenu(){
 
 function goFolder(id){ location.hash = id ? '#/folder/' + encodeURIComponent(id) : ''; }
 
+/* ===================================================================
+   Trang sách — bìa, giới thiệu, mục lục. Chặng giữa thư viện và trình đọc:
+   bấm một cuốn ở thư viện vào đây trước, rồi mới bấm "Đọc".
+   Mục lục cần `nCh`/`toc` nên vẫn phải ensureBook() (tải + tách + cache).
+   =================================================================== */
+const D = { id: null, meta: null };
+let detailToken = 0;
+let dTab = 'intro';
+
+async function openDetail(id){
+  const entry = byId(id);
+  if (!entry || entry.folder) { location.hash = ''; return; }
+  const token = ++detailToken;
+  showView('detail');
+  D.id = id; D.meta = null; dTab = 'intro';
+  renderDetail(entry);
+  let meta;
+  try { meta = await ensureBook(entry); }
+  catch (e) {
+    if (token !== detailToken) return;
+    $('#dChapters').innerHTML =
+      '<li class="d-note">Không tải được nội dung sách.<br><small>' + esc(String(e.message || e)) + '</small></li>';
+    return;
+  }
+  if (token !== detailToken) return;       // đã rời trang / đổi sách trong lúc tải
+  D.meta = meta; nChCache[id] = meta.nCh;
+  renderDetail(entry);
+}
+
+function renderDetail(entry){
+  const meta = D.meta, p = prog(entry.id);
+  const n = meta ? meta.nCh : nChCache[entry.id];
+  const done = (p?.read || []).length;
+  const started = !!p && (p.i > 0 || (p.ratio || 0) > 0.01 || done > 0);
+  const pct = n ? Math.min(100, Math.round((((p?.i || 0) + (p?.ratio || 0)) / n) * 100)) : 0;
+
+  const cover = $('#dCover');
+  cover.style.cssText = coverStyle(entry.title);
+  cover.textContent = initials(entry.title);
+  $('#dHeroBg').style.cssText = coverStyle(entry.title);
+  $('#dTitle').textContent = entry.title;
+  const au = $('#dAuthor'); au.textContent = entry.author || ''; au.hidden = !entry.author;
+  const path = folderPath(entry);
+  const fo = $('#dFolder'); fo.textContent = '📁 ' + path.join(' › '); fo.hidden = !path.length;
+
+  $('#dStats').innerHTML = [[n || '…', 'Chương'], [done, 'Đã đọc'], [pct + '%', 'Tiến độ']]
+    .map(([v, l]) => `<div><b>${esc(String(v))}</b><span>${esc(l)}</span></div>`).join('');
+
+  const label = !started ? 'Đọc từ đầu' : 'Đọc tiếp';
+  $('#dRead').textContent = label;
+  $('#dReadBtn').textContent = label;
+  $('#dBotTitle').textContent = entry.title;
+  $('#dBotSub').textContent = !started ? (n ? n + ' chương' : '')
+    : (meta ? chapterLabel(meta.toc, Math.min(p.i, meta.nCh - 1)) : 'Đang đọc');
+
+  $('#dIntro').innerHTML = entry.desc
+    ? esc(entry.desc).split(/\n+/).filter(s => s.trim()).map(s => `<p>${s}</p>`).join('')
+    : '<p class="d-note">Chưa có giới thiệu cho cuốn này.</p>';
+
+  const ul = $('#dChapters');
+  if (!meta) { ul.innerHTML = '<li class="d-note">Đang tải mục lục…</li>'; }
+  else {
+    const read = new Set(p?.read || []);
+    ul.innerHTML = '';
+    meta.toc.forEach((c, i) => {
+      const li = el('li');
+      const a = el('a', (read.has(i) ? 'read' : '') + (p && p.i === i ? ' cur' : ''),
+                    esc(chapterLabel(meta.toc, i)));
+      a.dataset.i = i;
+      li.appendChild(a); ul.appendChild(li);
+    });
+  }
+  setDTab(dTab);
+}
+
+function setDTab(t){
+  dTab = t;
+  document.querySelectorAll('#dTabs button').forEach(b => b.classList.toggle('on', b.dataset.dtab === t));
+  $('#dIntro').hidden    = t !== 'intro';
+  $('#dChapters').hidden = t !== 'toc';
+}
+
+/* `i` bỏ trống = đọc tiếp từ chỗ đã lưu */
+function startReading(i){
+  if (!D.id) return;
+  location.hash = '#/read/' + encodeURIComponent(D.id) + (typeof i === 'number' ? '/' + i : '');
+}
+
 /* ---------- trình đọc ---------- */
 const R = { id: null, meta: null, i: 0 };
 let currentView = 'library';
@@ -438,7 +530,9 @@ function bookPct(){ return Math.min(100, Math.round(((R.i + chapterRatio()) / (R
 function showView(v){
   currentView = v;
   $('#view-library').hidden = v !== 'library';
+  $('#view-detail').hidden  = v !== 'detail';
   $('#view-reader').hidden  = v !== 'reader';
+  if (v !== 'detail') { detailToken++; D.id = null; D.meta = null; }
   if (v !== 'reader') {
     if (cancelRestore) cancelRestore();   // nếu không, timer cuộn sẽ kéo cả trang thư viện
     R.id = null; R.meta = null;
@@ -447,8 +541,9 @@ function showView(v){
   }
 }
 
+/* `at` = chương muốn mở; bỏ trống thì đọc tiếp từ tiến độ đã lưu */
 let openToken = 0, shortChTimer;
-async function openBook(id){
+async function openBook(id, at){
   const entry = byId(id);
   if (!entry || entry.folder) { location.hash = ''; return; }
   const token = ++openToken;              // đổi sách liên tục: chỉ lần mở cuối cùng được thắng
@@ -470,14 +565,15 @@ async function openBook(id){
   R.id = id; R.meta = meta;
   nChCache[id] = meta.nCh;
   const p = prog(id) || {};
+  const jump = typeof at === 'number';
   buildChapterList();
-  await loadChapter(Math.max(0, Math.min(p.i || 0, meta.nCh - 1)), p.ratio || 0);
+  await loadChapter(Math.max(0, Math.min(jump ? at : (p.i || 0), meta.nCh - 1)), jump ? 0 : (p.ratio || 0));
   showHint();
 }
 
 /* "Chương 12: …" — thêm số chương nếu tiêu đề trong sách không có sẵn */
-function chapterLabel(i){
-  const t = (R.meta.toc[i]?.title || '').trim();
+function chapterLabel(toc, i){
+  const t = (toc[i]?.title || '').trim();
   if (/^(chuong|hoi|phan|quyen|tap|chapter|loi noi dau|mo dau)\b/.test(norm(t))) return t;
   return 'Chương ' + (i + 1) + (t ? ': ' + t : '');
 }
@@ -488,7 +584,7 @@ async function loadChapter(i, ratio){
   R.i = i;
   resetEdge();
   prose().innerHTML = ch ? ch.html : '<p>Không tải được chương này.</p>';
-  const label = chapterLabel(i);
+  const label = chapterLabel(R.meta.toc, i);
   $('#sheetTitle').textContent = label;
   $('#rTitle').textContent = label;
   $('#prevCh').disabled = i <= 0;
@@ -697,7 +793,23 @@ function wire(){
     if (e.key === 'Escape') { closeSearch(); $('#btnSearch').focus(); }
   });
 
-  $('#rBack').addEventListener('click', () => { closeSheet(); location.hash = ''; });
+  /* trang sách */
+  $('#dBack').addEventListener('click', () => { location.hash = libHash; });
+  $('#dRead').addEventListener('click', () => startReading());
+  $('#dReadBtn').addEventListener('click', () => startReading());
+  $('#dMenu').addEventListener('click', () => { const b = byId(D.id); if (b) bookMenu(b); });
+  $('#dTabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) setDTab(b.dataset.dtab);
+  });
+  $('#dChapters').addEventListener('click', e => {
+    const a = e.target.closest('a[data-i]'); if (a) startReading(+a.dataset.i);
+  });
+
+  /* từ trình đọc quay ra: về trang sách chứ không nhảy thẳng ra thư viện */
+  $('#rBack').addEventListener('click', () => {
+    const id = R.id; closeSheet();
+    location.hash = id ? '#/book/' + encodeURIComponent(id) : libHash;
+  });
   $('#rMenu').addEventListener('click', openSheet);
 
   /* kéo quá mép để đổi chương */
@@ -722,6 +834,8 @@ function wire(){
   // chạm vào trang để mở bottom sheet (chỉ trong trình đọc)
   document.addEventListener('click', e => {
     if (currentView !== 'reader') return;
+    // cú bấm "Đọc" ở trang sách không được biến thành cú chạm mở mục lục
+    if (e.target.closest('#view-detail')) return;
     if (e.target.closest('#sheet') || e.target.closest('#rtop') ||
         e.target.closest('a') || e.target.closest('.chapnav')) return;
     if (e.target.closest('#overlay')) { closeSheet(); return; }
@@ -739,6 +853,11 @@ function wire(){
         else if (cwd) goFolder(byId(cwd)?.parent || null);
       }
       else if (e.key === '/' && $('#searchBar').hidden) { e.preventDefault(); openSearch(); }
+      return;
+    }
+    if (currentView === 'detail') {
+      if (e.key === 'Escape') location.hash = libHash;
+      else if (e.key === 'Enter') startReading();
       return;
     }
     if (e.key === 'Escape') closeSheet();
@@ -759,15 +878,27 @@ function wire(){
 }
 
 /* ---------- routing ----------
-   #/book/<id> → trình đọc | #/folder/<id> → thư mục | '' → gốc
+   #/book/<id> → trang sách | #/read/<id>[/<chương>] → trình đọc
+   #/folder/<id> → thư mục | '' → gốc
    Mở app luôn vào thư viện; muốn đọc tiếp thì bấm vào sách ở tab Lịch sử. */
+let libHash = '';                         // hash của thư viện lúc rời đi, để nút ‹ quay lại đúng chỗ
 function route(){
+  const r = location.hash.match(/^#\/read\/([^/]+)(?:\/(\d+))?$/);
+  if (r) {
+    const id = decodeURIComponent(r[1]);
+    openBook(id, r[2] == null ? undefined : +r[2]);
+    // số chương chỉ là lệnh "mở tại đây"; bỏ khỏi URL để reload sau này theo tiến độ đã lưu
+    if (r[2] != null) history.replaceState(null, '', '#/read/' + encodeURIComponent(id));
+    return;
+  }
+
   const b = location.hash.match(/^#\/book\/(.+)$/);
-  if (b) { openBook(decodeURIComponent(b[1])); return; }
+  if (b) { openDetail(decodeURIComponent(b[1])); return; }
 
   const f = location.hash.match(/^#\/folder\/(.+)$/);
   cwd = f ? decodeURIComponent(f[1]) : null;
   if (f) tab = 'browse';                  // vào thư mục thì phải đang ở tab Tủ sách
+  libHash = location.hash;
   showView('library'); renderLibrary();
 }
 
