@@ -6,14 +6,24 @@
       "title": "Nội Công Tâm Pháp",
       "author": "Giang Thanh",
       "file": "noi-cong-tam-phap.html",
-      "rev": 1
+      "rev": 2,
+      "desc": "Giáo trình nội công đi từ gốc: hiểu sơ lược cơ thể, thuộc đường Châu Thiên trên hai kinh Nhâm Đốc, giữ sinh lý thiên nhiên trong ăn ngủ, rồi mới tới phép phu tọa và điều tức.\nSau phần nền là 12 phép luyện nội lực để dẫn khí ra tứ chi, khép lại bằng bài Ngũ Hành Quyền 110 động tác. Mỗi thế đều có hình chụp lại từ bản in. Soạn giả dặn thuộc xong phần trước mới được học phần sau."
     },
     {
       "id": "bat-doan-cam",
       "title": "Tự Luyện Bát Đoạn Cẩm Thiếu Lâm",
       "author": "Hàng Thanh",
       "file": "bat-doan-cam.html",
-      "rev": 1
+      "rev": 2,
+      "desc": "Tám thế Bát Đoạn Cẩm của Thiếu Lâm Tự, mỗi đoạn một câu khẩu quyết và một vùng thân thể được săn sóc — từ “Lưỡng thủ kình thiên lý tam tiêu” tới “Lưỡng thủ phan túc cố thận eo”.\nSoạn giả xếp đây là cuốn thấp nhất trong ba cuốn nội công của ông, dành cho người sơ căn: người yếu sức, văn nhân, người tập hoài không tiến bộ. Bản nguồn dừng ở đoạn thứ ba của phần phụ thuộc “Nới dãn toàn diện”, chín đoạn còn lại không có trong tập tin gốc."
+    },
+    {
+      "id": "thai-cuc-quyen",
+      "title": "Võ Đang Thái Cực Quyền",
+      "author": "Hàng Thanh",
+      "file": "thai-cuc-quyen.html",
+      "rev": 2,
+      "desc": "Bài Thái Cực Quyền của phái Võ Đang, do Dương-Trừng-Phủ thuyết, cư sĩ Hàng-Thanh dịch và xuất bản Trung Thu năm Giáp Dần (1974). Mở đầu là cận sử môn phái từ thế kỷ 18 đến 20 và mười điều yếu lĩnh, sau đó là đồ giải từng thức: động tác, yếu lý, kèm hình.\nBản PDF quét lại bản in chỉ còn tới thức 40 — Hồi thân, Hữu đăng cước. Phần Thôi Thủ và Phụ Lục ghi trong mục lục gốc đều thiếu."
     },
     {
       "type": "folder",
@@ -25,14 +35,16 @@
           "title": "Phần Đạo (chương 1–37)",
           "author": "Nguyễn Hiến Lê dịch",
           "file": "dao-duc-kinh-phan-dao.html",
-          "rev": 1
+          "rev": 2,
+          "desc": "Ba mươi bảy chương đầu Đạo Đức Kinh, phần bàn về Đạo — mở bằng câu “Đạo khả đạo, phi thường đạo”.\nMỗi chương in nguyên văn phiên âm Hán-Việt trước, bản dịch Nguyễn Hiến Lê sau. Các số trong ngoặc vuông như [5] là chú thích của dịch giả; bản nguồn không kèm phần chú thích ấy."
         },
         {
           "id": "dao-duc-kinh-phan-duc",
           "title": "Phần Đức (chương 38–81)",
           "author": "Nguyễn Hiến Lê dịch",
           "file": "dao-duc-kinh-phan-duc.html",
-          "rev": 1
+          "rev": 2,
+          "desc": "Bốn mươi bốn chương sau, từ 38 đến 81, phần bàn về Đức — cách ở đời, giữ mình và trị nước của người theo Đạo.\nPhần này chỉ có bản dịch Nguyễn Hiến Lê, không kèm nguyên văn Hán-Việt như Phần Đạo."
         }
       ]
     }
