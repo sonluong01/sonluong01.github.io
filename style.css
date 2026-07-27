@@ -167,6 +167,17 @@ body{
 #topbar-progress{ position:absolute; left:0; right:0; bottom:0; height:2px; pointer-events:none; }
 #topbar-progress > i{ display:block; height:100%; width:0%; background:var(--accent); transition:width .12s linear; }
 #content{ max-width:42em; margin:0 auto; padding:calc(52px + env(safe-area-inset-top)) 24px calc(40px + env(safe-area-inset-bottom)); }
+/* chuyển chương: trang cũ lướt mờ đi, trang mới vào từ chiều ngược lại (như lật trang).
+   `forwards` giữ trang cũ ẩn cho tới khi nội dung mới thay xong; thời lượng out
+   phải khớp CH_OUT_MS trong app.js. */
+#content.ch-out-next{ animation:ch-out-next .15s ease-in forwards; }
+#content.ch-out-prev{ animation:ch-out-prev .15s ease-in forwards; }
+#content.ch-in-next{ animation:ch-in-next .25s ease-out; }
+#content.ch-in-prev{ animation:ch-in-prev .25s ease-out; }
+@keyframes ch-out-next{ to{ opacity:0; transform:translateX(-26px); } }
+@keyframes ch-out-prev{ to{ opacity:0; transform:translateX(26px); } }
+@keyframes ch-in-next{ from{ opacity:0; transform:translateX(26px); } }
+@keyframes ch-in-prev{ from{ opacity:0; transform:translateX(-26px); } }
 .prose{ font-size:var(--fs); line-height:var(--lh); }
 .prose h2{ font-size:1.35em; font-weight:700; text-align:center; margin:2.2em 0 1.2em;
   padding-bottom:.5em; border-bottom:1px solid var(--rule); letter-spacing:.02em; }

@@ -547,6 +547,7 @@ async function openBook(id, at){
   R.id = null; R.meta = null;             // tránh scroll handler ghi tiến độ của cuốn cũ
   showView('reader');
   window.scrollTo(0, 0);
+  chapterIn(0);                           // gỡ ch-out-* còn kẹt nếu vừa rời sách giữa lúc chuyển chương
   $('#sheetTitle').textContent = entry.title;
   $('#chapterList').innerHTML = '';
   prose().innerHTML = '<p class="loading">Đang tải “' + esc(entry.title) + '”…</p>';
@@ -575,12 +576,36 @@ function chapterLabel(toc, i){
   return 'Chương ' + (i + 1) + (t ? ': ' + t : '');
 }
 
+/* ---------- hiệu ứng chuyển chương ----------
+   Sang chương sau: trang cũ lướt sang trái, trang mới vào từ phải (chương trước
+   thì ngược chiều). dir = 0 (mở sách, đọc tiếp theo tiến độ) thì không hiệu ứng. */
+const CH_OUT_MS = 150;                       // = thời lượng ch-out-* trong style.css
+const CH_ANIM = ['ch-out-next', 'ch-out-prev', 'ch-in-next', 'ch-in-prev'];
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+function chapterOut(dir){
+  const c = $('#content');
+  // đang mờ dở từ lượt bấm trước thì giữ nguyên, khỏi chớp lại trang cũ
+  if (!dir || reduceMotion() || /\bch-out-/.test(c.className)) return Promise.resolve();
+  c.classList.remove(...CH_ANIM);
+  c.classList.add(dir > 0 ? 'ch-out-next' : 'ch-out-prev');
+  return new Promise(res => setTimeout(res, CH_OUT_MS));
+}
+function chapterIn(dir){
+  const c = $('#content');
+  c.classList.remove(...CH_ANIM);
+  if (!dir || reduceMotion()) return;
+  void c.offsetWidth;                        // class vừa gỡ vừa thêm lại: reflow để animation chạy lại
+  c.classList.add(dir > 0 ? 'ch-in-next' : 'ch-in-prev');
+}
+
 let loadToken = 0;
-async function loadChapter(i, ratio){
+async function loadChapter(i, ratio, dir){
   if (cancelRestore) cancelRestore();
   const meta = R.meta, token = ++loadToken;
+  const anim = chapterOut(dir);              // mờ trang cũ song song với việc tải
   let ch = null;
   try { ch = await fetchChapter(meta, i); } catch {}
+  await anim;
   // trong lúc chờ mạng người đọc có thể đã đổi chương / rời sách
   if (token !== loadToken || R.meta !== meta) return;
   R.i = i;
@@ -594,6 +619,7 @@ async function loadChapter(i, ratio){
   $('#nextCh').disabled = i >= R.meta.nCh - 1;
   highlightChapter();
   window.scrollTo(0, 0);
+  chapterIn(dir);
   saveNow(ratio > 0 ? ratio : 0);
   if (ratio > 0) restoreScroll(ratio);
   else updateProgress();
@@ -662,13 +688,16 @@ function edgeDrag(dy){
 function edgeRelease(){
   const dir = ovrDir, hit = ovr >= OVER;
   resetEdge();
-  if (dir && hit) { flipAt = Date.now(); gotoChapter(R.i + dir); }
+  // lùi bằng kéo quá mép = đang đọc ngược → vào cuối chương trước, không phải đầu
+  if (dir && hit) { flipAt = Date.now(); gotoChapter(R.i + dir, dir < 0); }
 }
 
-function gotoChapter(i){
+/* `atEnd`: mở thẳng cuối chương (chỉ ngả kéo lùi quá mép dùng);
+   nút ‹ ›, phím mũi tên và mục lục vẫn vào đầu chương. */
+function gotoChapter(i, atEnd){
   if (!R.meta || i < 0 || i >= R.meta.nCh) return;
   if (i > R.i && chapterRatio() > 0.5) markRead(R.i);   // đi tiếp = coi như đã đọc xong
-  loadChapter(i, 0);
+  loadChapter(i, atEnd ? 1 : 0, Math.sign(i - R.i));
 }
 
 function buildChapterList(){

@@ -1,5 +1,5 @@
 /* Tủ sách — offline app-shell cache */
-const CACHE = 'reader-v12';
+const CACHE = 'reader-v13';
 // Vỏ app + catalog. Chương sách (books/<dir>/*.html?v=rev) được cache lazily khi
 // tải lần đầu (xem fetch handler); rev mới = URL mới nên không cần bump CACHE.
 const ASSETS = [
