@@ -79,14 +79,18 @@
   --hover:#e6e4db; --sel:#d3d0c4; --overlay:rgba(26,24,20,.35);
   --shadow:rgba(0,0,0,.08); --drawer-shadow:rgba(0,0,0,.14); --danger:#9e1f18;
   --fs:19px; --lh:1.8;
-  color-scheme:light;
+  /* "only" = cấm trình duyệt tự làm tối trang. Chỉ "light" thôi là Samsung Internet
+     (và Chrome Android khi bật chế độ tối tự động) coi trang này là trang sáng
+     chưa biết chế độ tối, rồi đảo màu đè lên bảng màu bên dưới. Giá trị ở đây
+     ghi đè <meta name="color-scheme"> nên phải mang "only" y như thẻ meta. */
+  color-scheme:only light;
 }
 :root[data-theme="dark"]{
   --ink:#888889; --ink-strong:#e9e7e2; --muted:#9a9895; --accent:#dbd9d3; --on-accent:#1f1f21;
   --paper:#272729; --surface:#323234; --rule:#45454a; --quote:#b3b1ad;
   --hover:#35353a; --sel:#414147; --overlay:rgba(0,0,0,.6);
   --shadow:rgba(0,0,0,.5); --drawer-shadow:rgba(0,0,0,.65); --danger:#ff7b7b;
-  color-scheme:dark;
+  color-scheme:only dark;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -94,7 +98,7 @@
     --paper:#272729; --surface:#323234; --rule:#45454a; --quote:#b3b1ad;
     --hover:#35353a; --sel:#414147; --overlay:rgba(0,0,0,.6);
     --shadow:rgba(0,0,0,.5); --drawer-shadow:rgba(0,0,0,.65); --danger:#ff7b7b;
-    color-scheme:dark;
+    color-scheme:only dark;
   }
 }
 

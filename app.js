@@ -192,7 +192,11 @@ function effTheme(){
 function applyTheme(){
   if (settings.theme) document.documentElement.setAttribute('data-theme', settings.theme);
   else document.documentElement.removeAttribute('data-theme');
-  const ic = $('#themeIc'); if (ic) ic.textContent = effTheme() === 'dark' ? '☀️' : '🌙';
+  const dark = effTheme() === 'dark';
+  const ic = $('#themeIc'); if (ic) ic.textContent = dark ? '☀️' : '🌙';
+  // Chốt lại chế độ cho trình duyệt: "only" chặn Samsung Internet / Chrome Android
+  // tự đảo màu trang khi chế độ tối của máy ngược với chế độ người đọc chọn.
+  const cs = $('#meta-cs'); if (cs) cs.setAttribute('content', dark ? 'only dark' : 'only light');
   const m = $('#meta-theme'); if (m) m.setAttribute('content', getComputedStyle(document.body).backgroundColor);
 }
 function toggleTheme(){ settings.theme = effTheme() === 'dark' ? 'light' : 'dark'; saveSettings(); applyTheme(); }

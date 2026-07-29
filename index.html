@@ -4,19 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Khai báo app tự lo cả hai chế độ. Thiếu dòng này, "chế độ tối tự động" của
-     Chrome/Samsung Internet trên Android sẽ ép nền đen + chữ trắng đè lên bảng màu. -->
-<meta name="color-scheme" content="light dark">
+     Chrome/Samsung Internet trên Android sẽ ép nền đen + chữ trắng đè lên bảng màu.
+     Script bên dưới đổi ngay thành "only light"/"only dark" — xem chú thích ở đó. -->
+<meta name="color-scheme" content="light dark" id="meta-cs">
+<meta name="theme-color" content="#dddbd1" id="meta-theme">
 <title>Tủ sách</title>
 <script>
 /* apply saved theme before paint (no flash) */
-(function(){try{var s=JSON.parse(localStorage.getItem('reader-settings'));
-  if(s&&(s.theme==='dark'||s.theme==='light'))document.documentElement.setAttribute('data-theme',s.theme);
-  if(s&&s.fontSize)document.documentElement.style.setProperty('--fs',s.fontSize+'px');
-}catch(e){}})();
+(function(){
+  var d=document.documentElement, s=null, t='';
+  try{ s=JSON.parse(localStorage.getItem('reader-settings')); }catch(e){}
+  if(s&&(s.theme==='dark'||s.theme==='light')){ t=s.theme; d.setAttribute('data-theme',t); }
+  if(s&&s.fontSize) d.style.setProperty('--fs',s.fontSize+'px');
+  /* "light dark" chỉ nói app *hỗ trợ* cả hai — Samsung Internet bật "Chế độ tối"
+     vẫn tự đảo màu trang khi app đang ở nền sáng. Từ khoá "only" mới là lệnh cấm
+     trình duyệt tự làm tối. Phải chốt đúng một chế độ, nên tính sẵn ở đây thay vì
+     để mặc định. applyTheme() trong app.js giữ hai thẻ này khớp về sau. */
+  var dark = t ? t==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  document.getElementById('meta-cs').content = dark ? 'only dark' : 'only light';
+  document.getElementById('meta-theme').content = dark ? '#272729' : '#dddbd1';
+})();
 </script>
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#dddbd1" id="meta-theme">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
