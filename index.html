@@ -41,6 +41,7 @@
     <h1 id="libTitle">Tủ sách</h1>
     <div class="lib-actions">
       <button id="btnSearch" class="iconbtn" title="Tìm sách" aria-label="Tìm sách">🔍</button>
+      <button id="cloudBtn" class="iconbtn" title="Tài khoản &amp; đồng bộ" aria-label="Tài khoản và đồng bộ">☁</button>
       <button id="btnSettings" class="iconbtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
     </div>
   </header>
@@ -138,6 +139,48 @@
   </div>
 </div>
 
+<!-- ===== Tài khoản & đồng bộ đám mây (Supabase) ===== -->
+<div id="acc" class="menu" hidden>
+  <div class="menu-bg"></div>
+  <div class="menu-card">
+    <div class="menu-title">Tài khoản &amp; đồng bộ</div>
+
+    <div id="accOff" class="acc-body" hidden>
+      <p class="acc-note">Chưa bật đồng bộ đám mây — tiến độ đọc chỉ nằm trên máy này.</p>
+      <p class="acc-note">Điền <code>url</code> và <code>anonKey</code> vào <code>config.js</code>;
+        các bước có trong <code>SETUP-SUPABASE.md</code>.</p>
+    </div>
+
+    <div id="accOut" class="acc-body" hidden>
+      <p class="acc-note">Đăng nhập để chương đã đọc và vị trí đang đọc theo bạn sang máy khác.</p>
+      <label class="acc-field"><span>Email</span>
+        <input id="accEmail" type="email" autocomplete="email" spellcheck="false" autocapitalize="off"></label>
+      <label class="acc-field"><span>Mật khẩu</span>
+        <span class="acc-pw">
+          <input id="accPass" type="password" autocomplete="current-password">
+          <button class="acc-eye" data-eye="accPass" title="Hiện mật khẩu" aria-label="Hiện mật khẩu">👁</button>
+        </span></label>
+      <div class="acc-btns">
+        <button id="accSignIn" class="acc-primary">Đăng nhập</button>
+        <button id="accSignUp" class="acc-ghost">Tạo tài khoản</button>
+      </div>
+    </div>
+
+    <div id="accIn" class="acc-body" hidden>
+      <p id="accWho" class="acc-who"></p>
+      <div class="acc-btns">
+        <button id="accSyncNow" class="acc-primary">Đồng bộ ngay</button>
+        <button id="accSignOut" class="acc-ghost danger">Đăng xuất</button>
+      </div>
+    </div>
+
+    <p id="accStatus" class="acc-status"></p>
+    <button id="accClose" class="menu-cancel">Đóng</button>
+  </div>
+</div>
+
 <script src="app.js"></script>
+<script src="config.js"></script>
+<script src="sync.js"></script>
 </body>
 </html>

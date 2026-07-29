@@ -2,8 +2,10 @@
 const CACHE = 'reader-v14';
 // Vỏ app + catalog. Chương sách (books/<dir>/*.html?v=rev) được cache lazily khi
 // tải lần đầu (xem fetch handler); rev mới = URL mới nên không cần bump CACHE.
+// API Supabase là cross-origin nên fetch handler bỏ qua: đồng bộ không bao giờ ăn
+// bản cache cũ, mất mạng thì nó lỗi sạch sẽ rồi thử lại ở lần lưu tiến độ sau.
 const ASSETS = [
-  './', 'index.html', 'style.css', 'app.js', 'manifest.json',
+  './', 'index.html', 'style.css', 'app.js', 'config.js', 'sync.js', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/maskable-512.png',
   'books/library.json'
 ];

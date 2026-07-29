@@ -391,3 +391,34 @@ body.menu-open .menu-card{ transform:translateY(0); }
   .d-head h2{ font-size:1.15em; }
   .d-primary{ padding:11px 18px; }
 }
+
+/* ===== Tài khoản & đồng bộ đám mây ===== */
+.iconbtn.err{ color:var(--danger); border-color:var(--danger); }
+#acc .menu-card{ padding-bottom:calc(12px + env(safe-area-inset-bottom)); }
+body.acc-open #acc .menu-bg{ opacity:1; }
+body.acc-open #acc .menu-card{ transform:translateY(0); }
+.acc-body{ padding:4px 22px 6px; border-top:1px solid var(--rule); }
+.acc-body[hidden]{ display:none; }
+.acc-note{ color:var(--muted); font-size:14px; line-height:1.6; margin:12px 0; }
+.acc-note code{ font-size:.92em; background:var(--hover); padding:1px 5px; border-radius:5px; }
+.acc-who{ font-size:15px; color:var(--ink-strong); margin:14px 0 4px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.acc-field{ display:block; margin:12px 0; }
+.acc-field > span{ display:block; font-size:12.5px; color:var(--muted); margin-bottom:5px; }
+.acc-pw{ display:flex; gap:6px; align-items:center; }
+.acc-field input{ width:100%; min-width:0; font:inherit; font-size:16px; color:var(--ink);
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:11px 13px; }
+.acc-field input:focus{ outline:none; border-color:var(--accent); }
+.acc-eye{ flex:none; background:transparent; border:1px solid var(--rule); border-radius:10px;
+  color:var(--muted); cursor:pointer; font:inherit; font-size:15px; line-height:1; padding:11px 12px; }
+.acc-eye.on{ border-color:var(--accent); color:var(--ink); }
+.acc-btns{ display:flex; gap:10px; margin:16px 0 4px; }
+.acc-primary{ flex:1; background:var(--accent); color:var(--on-accent); border:0; border-radius:12px;
+  font:inherit; font-weight:700; font-size:15px; padding:13px 10px; cursor:pointer; }
+.acc-primary:hover{ opacity:.88; }
+.acc-ghost{ flex:1; background:transparent; border:1px solid var(--rule); border-radius:12px;
+  color:var(--ink); font:inherit; font-size:15px; padding:13px 10px; cursor:pointer; }
+.acc-ghost:hover{ background:var(--hover); }
+.acc-ghost.danger{ color:var(--danger); }
+.acc-ghost[hidden]{ display:none; }
+.acc-status{ padding:10px 22px 0; color:var(--muted); font-size:13px; line-height:1.55; }

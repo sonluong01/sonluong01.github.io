@@ -60,10 +60,58 @@ const LS = {
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 };
 let settings = LS.get('reader-settings', { theme: null, fontSize: 19 });
-/* progress[bookId] = { i, ratio, read: [chương đã đọc], updatedAt } */
+/* progress[bookId] = { i, ratio, read: [chương đã đọc], resetAt, updatedAt } */
 let progress = LS.get('reader-progress', {});
+/* Bia mộ: deleted[bookId] = lúc xoá khỏi lịch sử. Chỉ để đồng bộ biết đây là
+   "đã xoá" chứ không phải "chưa có" — thiếu nó thì lần kéo về sau sách xoá lại mọc lên. */
+let deleted = LS.get('reader-progress-del', {});
 const saveSettings = () => LS.set('reader-settings', settings);
-const saveProgress = () => LS.set('reader-progress', progress);
+const saveProgress = () => { LS.set('reader-progress', progress); window.cloud?.schedule(); };
+const saveDeleted  = () => LS.set('reader-progress-del', deleted);
+/* dọn bia mộ quá 90 ngày — server chắc chắn đã nhận lệnh xoá từ lâu */
+(() => { const cut = Date.now() - 90 * 864e5, n = Object.keys(deleted).length;
+  for (const id of Object.keys(deleted)) if (deleted[id] < cut) delete deleted[id];
+  if (n !== Object.keys(deleted).length) saveDeleted(); })();
+
+/* ---------- trộn tiến độ từ đám mây (sync.js gọi) ----------
+   `read` lấy hợp của hai bên nên dấu ✓ không bao giờ mất; vị trí đang đọc theo
+   bên có `updatedAt` mới hơn. Cuốn đang mở trong trình đọc chỉ nhận thêm ✓,
+   không bị nhảy chỗ giữa chừng. `resetAt` ("Đọc lại từ đầu") xoá sạch phần ✓
+   mà phía kia ghi *trước* lúc reset. */
+function mergeProgress(remote){
+  let changed = false, tombChanged = false;
+  for (const id of Object.keys(remote)) {
+    const r = remote[id], tomb = deleted[id] || 0;
+    if (tomb) {
+      if (tomb >= (r.updatedAt || 0)) continue;   // xoá ở máy này sau bản trên server → giữ nguyên xoá
+      delete deleted[id]; tombChanged = true;     // máy kia đọc tiếp sau khi xoá → nhận lại
+    }
+    const l = progress[id];
+    if (!l) {
+      progress[id] = { i: r.i, ratio: r.ratio, read: r.read.slice(), resetAt: r.resetAt || 0, updatedAt: r.updatedAt };
+      changed = true; continue;
+    }
+    const lReset = l.resetAt || 0, rReset = r.resetAt || 0;
+    const lRead = rReset > (l.updatedAt || 0) ? [] : (l.read || []);
+    const rRead = lReset > (r.updatedAt || 0) ? [] : r.read;
+    const keepLocal = (l.updatedAt || 0) >= (r.updatedAt || 0) || R.id === id;
+    const m = { i: keepLocal ? l.i : r.i, ratio: keepLocal ? l.ratio : r.ratio,
+                read: [...new Set([...lRead, ...rRead])].sort((a, b) => a - b),
+                resetAt: Math.max(lReset, rReset),
+                updatedAt: Math.max(l.updatedAt || 0, r.updatedAt || 0) };
+    if (JSON.stringify(m) !== JSON.stringify(l)) { progress[id] = m; changed = true; }
+  }
+  if (tombChanged) saveDeleted();
+  if (changed) saveProgress();
+  return changed;
+}
+
+/* Vẽ lại đúng màn hình đang đứng sau khi tiến độ đổi từ bên ngoài */
+function syncRepaint(){
+  if (currentView === 'library') renderLibrary();
+  else if (currentView === 'detail') { const b = byId(D.id); if (b) renderDetail(b); }
+  else if (currentView === 'reader') paintRead();
+}
 
 /* ---------- DOM helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -386,7 +434,9 @@ function bookMenu(b){
     currentView !== 'detail' && { label: '📖 Trang sách',
       run: () => { location.hash = '#/book/' + encodeURIComponent(b.id); } },
     has && { label: '🗑 Xoá khỏi lịch sử đọc', danger: true, run: () => {
-      delete progress[b.id]; saveProgress();
+      delete progress[b.id];
+      deleted[b.id] = Date.now(); saveDeleted();
+      saveProgress();
       if (currentView === 'detail' && D.id === b.id) renderDetail(b); else renderLibrary();
       toast('Đã xoá lịch sử của “' + b.title + '”.');
     } }
@@ -741,14 +791,15 @@ function saveNow(ratioOverride){
   if (!R.id) return;
   const ratio = (typeof ratioOverride === 'number') ? ratioOverride : chapterRatio();
   const p = progress[R.id] || {};
-  progress[R.id] = { i: R.i, ratio, read: p.read || [], updatedAt: Date.now() };
+  progress[R.id] = { i: R.i, ratio, read: p.read || [], resetAt: p.resetAt || 0, updatedAt: Date.now() };
+  if (deleted[R.id]) { delete deleted[R.id]; saveDeleted(); }   // đọc lại rồi thì thôi xoá
   saveProgress();
 }
 function scheduleSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
 
 function markRead(i){
   if (!R.id || typeof i !== 'number') return;
-  const p = progress[R.id] || (progress[R.id] = { i: R.i, ratio: 0, read: [], updatedAt: Date.now() });
+  const p = progress[R.id] || (progress[R.id] = { i: R.i, ratio: 0, read: [], resetAt: 0, updatedAt: Date.now() });
   if (!p.read) p.read = [];
   if (p.read.includes(i)) return;
   p.read.push(i); p.read.sort((a, b) => a - b);
@@ -766,6 +817,9 @@ function clearAllProgress(){
   if (!confirm(`Xoá lịch sử đọc của ${n} cuốn?\n\n`
     + 'Vị trí đang đọc và các chương đã đánh dấu ✓ sẽ mất. '
     + 'Sách đã tải về vẫn còn, chỉ là đọc lại từ đầu.')) return;
+  const now = Date.now();
+  for (const id of Object.keys(progress)) deleted[id] = now;
+  saveDeleted();
   progress = {}; saveProgress();
   renderLibrary();
   toast('Đã xoá lịch sử đọc.');
@@ -776,7 +830,9 @@ function resetCurrentBook(){
   if (!R.id || !R.meta) return;
   if (!confirm('Đọc lại “' + R.meta.title + '” từ đầu?\n\n'
     + 'Vị trí đang đọc và các chương đã đánh dấu ✓ của cuốn này sẽ bị xoá.')) return;
-  delete progress[R.id]; saveProgress();
+  // `resetAt` để máy khác biết đây là "đọc lại", chứ không phải mất dấu ✓ do lỗi
+  progress[R.id] = { i: 0, ratio: 0, read: [], resetAt: Date.now(), updatedAt: Date.now() };
+  saveProgress();
   paintRead(); closeSheet();
   loadChapter(0, 0);
   toast('Đã xoá lịch sử đọc của cuốn này.');
@@ -884,6 +940,7 @@ function wire(){
   document.addEventListener('keydown', e => {
     if (e.target.matches && e.target.matches('input,textarea')) return;
     if (!$('#menu').hidden) { if (e.key === 'Escape') closeMenu(); return; }
+    if (!$('#acc').hidden) return;          // modal tài khoản tự lo phím của nó (sync.js)
     if (currentView === 'library') {
       if (e.key === 'Escape') {
         if (!$('#searchBar').hidden) closeSearch();
@@ -947,5 +1004,6 @@ function route(){
   for (const m of cached) nChCache[m.id] = m.nCh;       // để thẻ sách hiện "đã đọc x/y" ngay
   await loadCatalog();
   route();
+  window.cloud?.start();                                // kéo tiến độ từ đám mây nếu đã đăng nhập
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
